@@ -2326,7 +2326,7 @@
         evidence: [
           ["Model Choice", "I chose a waveform-based approach to investigate separation while retaining the pipa's attacks and timbre."],
           ["Data Pipeline", "My scripts generate paired mixture, pipa, and other stems with controlled gain and split checking."],
-          ["Observed Result", "In listening checks, the accompaniment output was more useful than the isolated pipa output, which still contained artifacts."],
+          ["Tea House Performance", "I used the isolated pipa to transcribe sheet music for my Tea House performance, and the separated piano as rehearsal accompaniment when my pianist classmate was unavailable."],
           ["Teaching", "I later used the project to explain datasets, model selection, and audio separation to students."]
         ],
         metrics: [
@@ -2334,10 +2334,10 @@
           ["Model", "Demucs-style waveform separator with two output stems"],
           ["Training", "50 epochs"],
           ["Output", "Hugging Face Space with Gradio interface"],
-          ["Status", "Working prototype; evaluation incomplete"]
+          ["Status", "Working prototype used in personal rehearsal"]
         ],
         sections: [
-          ["Limitations", "The training data is small and biased toward piano accompaniment. Some source recordings have copyright restrictions, and a reliable held-out evaluation is still incomplete. This prototype is not a validated separation benchmark."]
+          ["Limitations", "The dataset is small and biased toward piano accompaniment, and the isolated pipa can contain artifacts. Some source recordings have copyright restrictions. Practical rehearsal use does not establish general separation quality."]
         ]
       },
       {
@@ -2404,7 +2404,7 @@
         metrics: [
           ["Medium", "Branching interactive video"],
           ["Tools", "Blender, Videostar, CapCut"],
-          ["Publication", "Bilibili interactive video"]
+          ["Reach", "Approximately 43,000 views on Bilibili"]
         ],
         sections: []
       },
@@ -2427,22 +2427,17 @@
           ["Cleaned Code Excerpt", "0428-unity-code-excerpt.cs"]
         ],
         thesis: "Can a new perspective reveal something different in the same object? 0428 pairs this question with a story about free will inside a world designed by someone else.",
-        signature: [
-          ["Concept", "A 2D character questions whether choice is real inside a world made by someone else."],
-          ["Mechanic", "Click to rotate the object, then hide selected branches; clear the level when the shadow matches the target."],
-          ["Build", "Built under a 24-hour capstone constraint; my ownership was the core Unity logic and playable mechanism."]
-        ],
         evidence: [
-          ["Shadow Logic", "The puzzle links light, object orientation, occlusion, and projected silhouette into one readable rule."],
-          ["Click States", "Odd/even click counts control rotation or branch visibility, then completion flags trigger feedback and scene transition."],
-          ["Narrative Form", "2D story scenes and 3D puzzle scenes both ask the same question: how much agency exists inside a designed system?"]
+          ["Perspective", "In the first level, clicking rotates an object to match a target shadow. Its shape stays the same, but its silhouette changes: a different orientation reveals something new."],
+          ["Second Level", "Clicking makes selected branches disappear to match another shadow. This level changes the object itself; the first level carries the central idea of a changed perspective."],
+          ["Implementation", "I built the core Unity interaction logic, including click states, completion checks, feedback, and scene transitions between 2D narrative and 3D puzzles."]
         ],
         metrics: [
           ["Format", "24-hour capstone project"],
           ["Role", "Lead programmer + mechanics designer"],
           ["Engine", "Unity 2022"],
           ["Team", "2 artists + 1 supporting programmer + 1 writer"],
-          ["Mechanics", "Rotation, selective occlusion, shadow matching"]
+          ["Mechanics", "Object rotation, branch removal, shadow matching"]
         ]
       },
       {
@@ -2518,9 +2513,9 @@
         ],
         thesis: "I wanted one place to revisit what I learn and how my ideas develop. MIMI brings scattered notes into a public archive, connecting my interests in computing, games, and human behaviour.",
         evidence: [
-          ["Content Structure", "I organised entries into Algorithms, Projects, and Games, using dates, excerpts, and topic tags to make the archive easy to browse."],
-          ["Publishing Workflow", "An admin dashboard lets me write in Markdown and maintain entries without rebuilding the page layout for each post."],
-          ["Ongoing Use", "The site holds machine-learning notes, Pipa development logs, and book reflections, preserving the thinking behind my finished projects."]
+          ["Product Design", "I defined the site's categories and functionality, organising entries with dates, excerpts, and topic tags."],
+          ["Publishing Workflow", "I designed the password-gated admin and backend article-upload workflow, with Markdown editing and entry management on Base44."],
+          ["Original Writing", "I wrote every article, from machine-learning notes and Pipa development logs to book reflections, documenting the thinking behind my projects."]
         ],
         metrics: [
           ["Format", "Personal website and lightweight CMS"],
