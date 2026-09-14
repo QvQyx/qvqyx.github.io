@@ -58,6 +58,10 @@ h1, h2, h3, .portfolio-title { font-family: Impact, "Arial Narrow", Arial, sans-
 .detail-panel .side-gallery img, .detail-panel .case-gallery img { opacity: 1; filter: none; border: 0; background: #f4f4f4; }
 .detail-panel .detail-link, .detail-panel .case-switch { background: #f4f4f4; color: #333; border: 0; border-radius: 4px; font: 600 14px/1.4 Arial, sans-serif; box-shadow: none; }
 .detail-panel .detail-link span { color: #333; }
+.detail-panel .pipeline-node > span { background: #111; color: #fff; box-shadow: none; font-family: Arial, sans-serif; }
+.detail-panel .pipeline-strip { background: none; border-color: #ddd; }
+.detail-panel .pipeline-strip::before { display: none; }
+.detail-panel .pipeline-node:hover, .detail-panel .pipeline-node.active { transform: none; }
 .detail-panel .close { top: 8px; right: 0; border: 1px solid #ddd; background: white; color: #333; width: 36px; height: 36px; }
 .case-controls { border-color: #ddd; padding: 24px; }
 footer { margin: 70px 5% 0; padding: 25px 0; border-top: 1px solid #ddd; display: flex; justify-content: space-between; font-size: 12px; color: #777; }

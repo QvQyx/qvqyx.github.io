@@ -2296,7 +2296,7 @@
       {
         id: "pipa",
         title: "Pipa Separator",
-        type: "Anchor Project · Music ML",
+        type: "Audio Source Separation",
         tag: "Music ML",
         image: "assets/pipa-app.png",
         media: [
@@ -2315,41 +2315,34 @@
           ["Inference Excerpt", "pipa-inference-excerpt.py"],
           ["Deployment Excerpt", "pipa-huggingface-app-excerpt.py"]
         ],
-        thesis: "I built a pipa / other source-separation prototype: generated a 132-track synthetic dataset, trained a waveform model, deployed a Gradio demo, and documented its limits honestly.",
-        signature: [
-          ["Reality", "I needed to hear a pipa line hidden inside an ensemble recording."],
-          ["System", "A Demucs-style two-stem audio separator trained from a small synthetic dataset."],
-          ["Afterlife", "A working web demo that also became a concrete teaching example."]
-        ],
+        thesis: "I wanted to practise the pipa part in an ensemble recording, but could not hear it clearly in isolation. This rehearsal problem led me to explore a custom two-stem separator.",
         pipeline: [
           ["1", "Problem", "A mixed recording made the pipa part hard to practise directly."],
           ["2", "Dataset", "16 pipa recordings and 16 accompaniments became 132 aligned mixtures."],
           ["3", "Training", "I trained a pipa / other separator after a pretrained-weight transfer failed."],
           ["4", "Demo", "The model became an upload-and-separate Hugging Face interface."],
-          ["5", "Reflection", "I documented what worked, what failed, and where the evaluation still needs repair."]
+          ["5", "Review", "I compared the separated outputs by listening and documented the remaining limitations."]
         ],
         evidence: [
-          ["Model Choice", "I chose a waveform-based Demucs path because pipa attacks and timbre are easy to damage in reconstruction."],
+          ["Model Choice", "I chose a waveform-based approach to investigate separation while retaining the pipa's attacks and timbre."],
           ["Data Pipeline", "My scripts generate paired mixture, pipa, and other stems with controlled gain and split checking."],
-          ["Training Result", "A 50-epoch run reached 0.1228 validation loss; listening tests showed stronger accompaniment cleanup than isolated-pipa quality."],
-          ["Final Effect", "A public web demo where users upload mixed audio and receive separated stems."]
+          ["Observed Result", "In listening checks, the accompaniment output was more useful than the isolated pipa output, which still contained artifacts."],
+          ["Teaching", "I later used the project to explain datasets, model selection, and audio separation to students."]
         ],
         metrics: [
           ["Dataset", "132 synthetic tracks: 106 train / 16 valid / 10 test"],
           ["Model", "Demucs-style waveform separator with two output stems"],
-          ["Training", "50 epochs; best validation loss 0.1228"],
+          ["Training", "50 epochs"],
           ["Output", "Hugging Face Space with Gradio interface"],
-          ["Code", "Data synthesis, dataset check, inference, and deployment scripts"],
-          ["Honesty", "Limited dataset and unresolved clean test-set evaluation"]
+          ["Status", "Working prototype; evaluation incomplete"]
         ],
         sections: [
-          ["Creative Idea", "Most open-source separators focus on vocals, drums, bass, or piano. I treated the missing pipa category as a personal music problem that could become a machine-learning system."],
-          ["Technical Honesty", "This is a serious prototype, not a finished benchmark. The separated pipa stem is not always clean, the dataset leans toward piano accompaniment, some source audio has copyright constraints, and the clean held-out test evaluation still needs repair."]
+          ["Limitations", "The training data is small and biased toward piano accompaniment. Some source recordings have copyright restrictions, and a reliable held-out evaluation is still incomplete. This prototype is not a validated separation benchmark."]
         ]
       },
       {
         id: "simulative",
-        title: "Simulative Fine-Tuning",
+        title: "Simulated Fine-Tuning",
         type: "Interactive Courseware",
         tag: "Classroom System",
         image: "assets/sft-dataset.png",
@@ -2360,26 +2353,21 @@
           "assets/sft-report.png"
         ],
         visual: "voting",
-        intro: "An interactive classroom web app for teaching fine-tuning: teacher dashboard, QR voting, live results, and an automatically generated summary report.",
+        intro: "A classroom simulation where students vote on model and dataset choices, then discuss the consequences.",
         links: [
           ["Live Web App", "https://simulative-finetuning.base44.app"]
         ],
-        thesis: "I built a classroom web app that turns fine-tuning into an interactive decision process: students vote by phone, the teacher screen tracks results, and the final report explains the model tradeoffs.",
-        signature: [
-          ["Problem", "Fine-tuning was hard to teach as definitions alone."],
-          ["System", "A projected teacher dashboard plus phone-based student voting."],
-          ["Outcome", "A classroom activity where model design becomes visible and debatable."]
-        ],
+        thesis: "Drawing on my experience building Pipa Separator, I wrote the complete lesson workflow myself. I wanted students to reason through the decisions behind an ML project rather than memorise definitions.",
         evidence: [
-          ["Final Effect", "Eight scenes guide a fine-tuning workflow from goal-setting to dataset choice, testing, deployment, and report."],
+          ["Lesson Structure", "Eight scenes connect goal-setting, model and dataset selection, simulated testing, deployment, and a summary report."],
           ["Student Use", "Students scan a QR code and vote from their phones, making model design a shared classroom decision."],
-          ["Outcome Logic", "Each option changes the score and explanation, showing why baseline fit, data quality, overfitting, and evaluation matter."]
+          ["Feedback", "A choice-based report prompts discussion of model fit, data quality, and overfitting. Grades and deployment screens are simulated teaching feedback, not measured model performance or actual deployment."]
         ],
         metrics: [
           ["Format", "Teacher screen + student QR voting"],
-          ["Scenes", "8-step fine-tuning workflow"],
-          ["Feedback", "Choice-based final report"],
-          ["Use", "X Academy selective ML lesson"]
+          ["Use", "Used in a live classroom lesson"],
+          ["My Contribution", "Complete lesson workflow and decision structure"],
+          ["Platform", "Base44"]
         ],
         sections: []
       },
@@ -2400,19 +2388,14 @@
           "Main visual: a low-poly scene from the published interactive mystery.",
           "English story map reconstructed from the original planning diagram.",
           "Classroom choice: \"That score must be wrong. I can message a senior student for you.\"",
-          "Clue scene: \"For now, if I find the fugitive, I can solve the victim's identity.\"",
+          "Clue scene: \"So, if I find the fugitive, I can resolve my unregistered status... right?\"",
           "Investigation route: a window-and-ladder scene showing how spatial clues guide viewer choices."
         ],
         intro: "A branching detective story where viewers choose investigation paths through self-built 3D scenes.",
         links: [
           ["Bilibili Interactive Video", "https://www.bilibili.com/video/BV1Eb421a7v6/"]
         ],
-        thesis: "I turned a linear mystery into an interactive video system: a story map, self-built 3D scenes, branching routes, multiple endings, and a published viewer-led investigation.",
-        signature: [
-          ["Concept", "I wanted a mystery that viewers could investigate instead of only watch."],
-          ["System", "A story map connecting scenes, choices, clues, and endings."],
-          ["Reach", "A public work that reached tens of thousands of viewers online."]
-        ],
+        thesis: "I wanted viewers to investigate a mystery rather than only watch it. I mapped choices and converging routes before connecting them to scenes and endings.",
         evidence: [
           ["Final Effect", "An interactive Bilibili video with branching routes, side paths, multiple endings, and a true ending."],
           ["Worldbuilding", "I modeled and staged low-poly 3D spaces, using lighting and camera movement to create a detective atmosphere."],
@@ -2421,8 +2404,7 @@
         metrics: [
           ["Medium", "Branching interactive video"],
           ["Tools", "Blender, Videostar, CapCut"],
-          ["Structure", "Story map + scenes + endings"],
-          ["Reach", "Published online with tens of thousands of views"]
+          ["Publication", "Bilibili interactive video"]
         ],
         sections: []
       },
@@ -2444,7 +2426,7 @@
         links: [
           ["Cleaned Code Excerpt", "0428-unity-code-excerpt.cs"]
         ],
-        thesis: "0428 turns a question about free will into a shadow puzzle: when the object stays almost the same, a changed viewpoint can reveal a different truth.",
+        thesis: "Can a new perspective reveal something different in the same object? 0428 pairs this question with a story about free will inside a world designed by someone else.",
         signature: [
           ["Concept", "A 2D character questions whether choice is real inside a world made by someone else."],
           ["Mechanic", "Click to rotate the object, then hide selected branches; clear the level when the shadow matches the target."],
@@ -2471,15 +2453,15 @@
         image: "assets/visualisation-overview.png",
         media: ["assets/visualisation-overview.png", "assets/visualisation-waveform.png", "assets/visualisation-spectrogram.png", "assets/visualisation-phase.png", "assets/visualisation-fourier.png"],
         mediaCaptions: ["", "01 / Waveform: inspect amplitude over time and adjust the mix.", "02 / Spectrogram: switch to a time-frequency view. Shown at a different mix setting.", "03 / Phase: compare shifted waves alongside their magnitude spectra.", "04 / Superposition: adjust three tones and inspect their sum and spectrum."],
-        intro: "Three browser-based experiments for exploring sound through direct manipulation.",
+        intro: "Three interactive demonstrations of waveforms, magnitude spectra, phase, and wave superposition.",
         links: [
           ["Live Web App", "https://visualisation.base44.app"]
         ],
-        thesis: "While exploring the audio concepts behind Pipa Separator, I wanted a way to make the ideas easier to explain. I turned them into small experiments that let learners connect a parameter change to a visible result.",
+        thesis: "While preparing a lesson on music source separation, I found Fourier analysis and phase differences difficult to explain in words alone. I made these visual teaching tools so students could see what changes when a parameter moves.",
         evidence: [
           ["Design Process", "I built HTML demos around adjustable variables, paired each control with a graph, and brought the experiments together in a searchable gallery."],
-          ["Learning Use", "Learners can compare representations, vary phase, and combine tones to build intuition before working through equations."],
-          ["Final Result", "A web library with three interactive demos, topic filters, and immediate visual feedback for independent exploration or teaching."]
+          ["Classroom Use", "I used the tools in a real lesson to demonstrate different signal representations, phase differences, and the superposition of tones."],
+          ["Delivery", "A searchable web gallery groups the demos by topic for classroom or independent use."]
         ],
         metrics: [
           ["Medium", "Browser-based learning tools"],
@@ -2507,24 +2489,18 @@
         ],
         intro: "A pair of personal study web apps: Daily Math turns missed problems into practice; DailyVocab turns a cleaned word list into recall training.",
         links: [
-          ["Live Web App", "https://v0-daily-math-app.vercel.app"]
+          ["Daily Math Web App", "https://v0-daily-math-app.vercel.app"]
         ],
-        thesis: "I built two small study systems from my own materials: Daily Math turns missed problems into feedback loops, and DailyVocab turns a GPT-cleaned word spreadsheet into active recall practice.",
-        signature: [
-          ["Problem", "My revision materials were useful, but too passive to practise from repeatedly."],
-          ["System", "Two lightweight web apps for math feedback and vocabulary recall."],
-          ["Outcome", "Personal study materials became reusable interfaces instead of static notes."]
-        ],
+        thesis: "I wanted to test myself rather than repeatedly reread my notes. The two apps turn my revision materials into short practice sessions with immediate feedback.",
         evidence: [
-          ["Daily Math", "111 prompts across Brain Teasers, IGCSE Math, and Further Math become answer checking and solution reveal."],
-          ["DailyVocab", "802 words from a cleaned study list become grouped recall cards with missed-word priority and saved progress."],
-          ["Workflow", "Spreadsheet and mistake bank first; GPT helps clean/group; Codex turns the structured data into practice interfaces."]
+          ["Daily Math", "Answer checking and worked solutions support review across three question categories."],
+          ["DailyVocab", "Bidirectional recall cards support grouped practice, missed-word priority, and saved progress. Responses are self-assessed, not independently graded."],
+          ["Vocabulary Workflow", "I collected words and synonyms from my study book in a spreadsheet, asked GPT to group related and easily confused words, then used Codex to build a recall app from the cleaned list."]
         ],
         metrics: [
           ["Math Scope", "111 questions across 3 categories"],
           ["Vocab Scope", "802 words from cleaned study list"],
-          ["Workflow", "Spreadsheet → GPT grouping → Codex web app"],
-          ["Learning", "Recall, missed-item review, feedback, solution reveal"]
+          ["Purpose", "Personal revision"]
         ],
         sections: []
       },
@@ -2594,7 +2570,7 @@
     function renderCaseDetail(project) {
       const thesis = project.thesis ? `
         <section class="case-thesis">
-          <strong>Project Thesis</strong>
+          <strong>Motivation</strong>
           <p>${project.thesis}</p>
         </section>
       ` : "";
@@ -2610,17 +2586,13 @@
       ` : "";
       const pipeline = project.pipeline ? `
         <section class="pipeline-strip">
-          ${project.pipeline.map(([number, title, body], index) => `
-            <article class="pipeline-node ${index === 0 ? "active" : ""}" data-pipeline-title="${title}" data-pipeline-body="${body}">
+          ${project.pipeline.map(([number, title, body]) => `
+            <article class="pipeline-node">
               <span>${number}</span>
               <strong>${title}</strong>
               <p>${body}</p>
             </article>
           `).join("")}
-        </section>
-        <section class="pipeline-readout">
-          <div class="readout-label">Focused Step</div>
-          <p class="readout-text">${project.pipeline[0][1]}: ${project.pipeline[0][2]}</p>
         </section>
       ` : "";
       const timeline = project.timeline ? `
@@ -2645,7 +2617,7 @@
         </section>
       ` : "";
       const sections = project.sections ? project.sections.map(([title, body]) => `
-        <section class="${title.includes("Honesty") ? "evidence-card honesty-note" : ""}">
+        <section class="${title === "Limitations" ? "evidence-card honesty-note" : ""}">
           <h3>${title}</h3>
           <p>${body}</p>
         </section>
@@ -2695,7 +2667,6 @@
       `).join("") + (usesWideGallery || usesSharedGallery ? linkBlock : sideGallery + linkBlock);
       document.getElementById("detailCopy").innerHTML = renderCaseDetail(project) + (usesWideGallery ? sideGallery : "");
       if (usesSharedGallery) panel.querySelector(".detail-body").insertAdjacentHTML("beforeend", sideGallery);
-      attachPipelineFocus();
       panel.classList.add("open");
       panel.setAttribute("aria-hidden", "false");
       setBodyHeight();
@@ -2811,18 +2782,6 @@
           item.dataset.dragY = "0";
           item.style.marginLeft = "";
           item.style.marginTop = "";
-        });
-      });
-    }
-
-    function attachPipelineFocus() {
-      const readout = panel.querySelector(".readout-text");
-      if (!readout) return;
-      panel.querySelectorAll(".pipeline-node").forEach(node => {
-        node.addEventListener("click", () => {
-          panel.querySelectorAll(".pipeline-node").forEach(item => item.classList.remove("active"));
-          node.classList.add("active");
-          readout.textContent = `${node.dataset.pipelineTitle}: ${node.dataset.pipelineBody}`;
         });
       });
     }
