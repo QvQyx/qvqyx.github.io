@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 980" role="img" aria-labelledby="title desc">
+  <title id="title">Someone Fell from the Forest - branching narrative map</title>
+  <desc id="desc">A horizontal English story map showing setup, entry, investigation branches, phone-wire route, endings, and true ending.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#182316"/>
+      <stop offset="1" stop-color="#071006"/>
+    </linearGradient>
+    <linearGradient id="node" x1="0" x2="1">
+      <stop offset="0" stop-color="#273224"/>
+      <stop offset="1" stop-color="#111a10"/>
+    </linearGradient>
+    <linearGradient id="end" x1="0" x2="1">
+      <stop offset="0" stop-color="#6d72b8"/>
+      <stop offset="1" stop-color="#4d568c"/>
+    </linearGradient>
+    <linearGradient id="trueEnd" x1="0" x2="1">
+      <stop offset="0" stop-color="#6fb4b8"/>
+      <stop offset="1" stop-color="#4a8e94"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-40%" width="140%" height="180%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity=".26"/>
+    </filter>
+    <style>
+      .label{font-family:Inter,Arial,sans-serif;font-size:22px;font-weight:760;fill:#eef0df}
+      .small{font-size:18px;font-weight:650;fill:#dbe0c9}
+      .tiny{font-size:15px;font-weight:680;letter-spacing:.05em;fill:#aeb79b;text-transform:uppercase}
+      .endText{font-size:17px;font-weight:800;fill:#f4f1ff}
+      .line{fill:none;stroke:#c7c8ac;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:.78}
+      .dash{stroke-dasharray:10 10;opacity:.58}
+      .node{fill:url(#node);stroke:#c4c2a0;stroke-width:2.4;rx:14;filter:url(#softShadow)}
+      .choice{fill:#142015;stroke:#8f957c;stroke-width:2;rx:12}
+      .end{fill:url(#end);stroke:#9fa5df;stroke-width:2;rx:13}
+      .true{fill:url(#trueEnd);stroke:#a6e5e4;stroke-width:2;rx:14}
+      .section{font-size:16px;font-weight:800;letter-spacing:.12em;fill:#89cbd0}
+    </style>
+  </defs>
+
+  <rect width="1800" height="980" fill="url(#bg)"/>
+  <g opacity=".12">
+    <circle cx="220" cy="150" r="140" fill="#c8d5a8"/>
+    <circle cx="1450" cy="790" r="240" fill="#89cbd0"/>
+    <path d="M0 490H1800M300 0V980M600 0V980M900 0V980M1200 0V980M1500 0V980" stroke="#d8d1ad" stroke-width="1"/>
+  </g>
+
+  <text x="90" y="92" class="section">INTERACTIVE NARRATIVE MAP</text>
+  <text x="90" y="140" class="label" style="font-size:44px">Someone Fell from the Forest</text>
+  <text x="92" y="178" class="small">A mystery route structure for a branching 3D interactive video.</text>
+
+  <!-- Main path -->
+  <rect class="node" x="90" y="265" width="210" height="64"/>
+  <text x="195" y="304" text-anchor="middle" class="label">Opening</text>
+
+  <rect class="choice" x="380" y="232" width="210" height="54"/>
+  <text x="485" y="266" text-anchor="middle" class="small">Class Group</text>
+  <rect class="choice" x="380" y="314" width="210" height="54"/>
+  <text x="485" y="348" text-anchor="middle" class="small">My Room</text>
+
+  <rect class="node" x="675" y="265" width="210" height="64"/>
+  <text x="780" y="304" text-anchor="middle" class="label">Departure</text>
+
+  <rect class="choice" x="965" y="224" width="230" height="54"/>
+  <text x="1080" y="258" text-anchor="middle" class="small">Pass Room 1</text>
+  <rect class="choice" x="965" y="306" width="230" height="54"/>
+  <text x="1080" y="340" text-anchor="middle" class="small">Enter Room</text>
+
+  <rect class="node" x="1275" y="265" width="220" height="64"/>
+  <text x="1385" y="304" text-anchor="middle" class="label">Game Start</text>
+
+  <path class="line" d="M300 297H380M590 259H675M590 341H675M885 297H965M1195 251H1275M1195 333H1275"/>
+  <path class="line" d="M195 329V410H1385V329"/>
+  <text x="1385" y="405" text-anchor="middle" class="tiny">Question: how many people are there?</text>
+
+  <!-- Investigation hub -->
+  <rect class="node" x="90" y="495" width="250" height="66"/>
+  <text x="215" y="535" text-anchor="middle" class="label">Outside Clue</text>
+  <text x="215" y="585" text-anchor="middle" class="tiny">organize thoughts / observe exterior</text>
+
+  <rect class="node" x="455" y="495" width="250" height="66"/>
+  <text x="580" y="535" text-anchor="middle" class="label">Indoor Search</text>
+  <text x="580" y="585" text-anchor="middle" class="tiny">observe room / unlock door</text>
+
+  <rect class="node" x="820" y="495" width="250" height="66"/>
+  <text x="945" y="535" text-anchor="middle" class="label">Window Route</text>
+  <text x="945" y="585" text-anchor="middle" class="tiny">climb out / find wire</text>
+
+  <rect class="node" x="1185" y="495" width="250" height="66"/>
+  <text x="1310" y="535" text-anchor="middle" class="label">Phone Wire</text>
+  <text x="1310" y="585" text-anchor="middle" class="tiny">identity clue / main line</text>
+
+  <path class="line" d="M1385 425V460H215V495M580 460V495M945 460V495M1310 460V495"/>
+  <path class="line" d="M705 528H820M1070 528H1185"/>
+
+  <!-- Middle choices -->
+  <rect class="choice" x="455" y="665" width="185" height="52"/>
+  <text x="548" y="698" text-anchor="middle" class="small">Go Home</text>
+  <rect class="choice" x="665" y="665" width="185" height="52"/>
+  <text x="758" y="698" text-anchor="middle" class="small">Slip Away</text>
+  <rect class="choice" x="875" y="665" width="185" height="52"/>
+  <text x="968" y="698" text-anchor="middle" class="small">Ask Crowd</text>
+  <rect class="choice" x="1085" y="665" width="185" height="52"/>
+  <text x="1178" y="698" text-anchor="middle" class="small">Eavesdrop</text>
+
+  <path class="line" d="M580 561V640H548V665M580 640H758V665M1310 561V640H968V665M1310 640H1178V665"/>
+
+  <rect class="end" x="880" y="790" width="205" height="56"/>
+  <text x="982" y="825" text-anchor="middle" class="endText">BE1: Leave Scene</text>
+  <rect class="end" x="1115" y="790" width="185" height="56"/>
+  <text x="1208" y="825" text-anchor="middle" class="endText">BE2: Fire</text>
+  <rect class="end" x="1330" y="790" width="270" height="56"/>
+  <text x="1465" y="825" text-anchor="middle" class="endText">BE3: Give Up the Chase</text>
+
+  <path class="line" d="M968 717V790"/>
+  <path class="line" d="M1178 717V748H1208V790"/>
+  <path class="line" d="M1178 717V748H1465V790"/>
+
+  <!-- True ending branch -->
+  <rect class="choice" x="1390" y="655" width="220" height="54"/>
+  <text x="1500" y="689" text-anchor="middle" class="small">Reconsider</text>
+  <rect class="choice" x="1510" y="560" width="210" height="54"/>
+  <text x="1615" y="594" text-anchor="middle" class="small">Interview</text>
+  <rect class="choice" x="1510" y="455" width="210" height="54"/>
+  <text x="1615" y="489" text-anchor="middle" class="small">Girl's Line</text>
+  <rect class="choice" x="1510" y="350" width="210" height="54"/>
+  <text x="1615" y="384" text-anchor="middle" class="small">Keep Investigating</text>
+  <rect class="true" x="1440" y="235" width="310" height="64"/>
+  <text x="1595" y="274" text-anchor="middle" class="endText">TRUE END: Someone Fell</text>
+
+  <path class="line dash" d="M1465 790V709"/>
+  <path class="line" d="M1500 655V614M1615 560V509M1615 455V404M1615 350V299"/>
+
+  <!-- Notes -->
+  <rect class="choice" x="90" y="715" width="245" height="72"/>
+  <text x="212" y="745" text-anchor="middle" class="small">Three routes cross-check</text>
+  <text x="212" y="772" text-anchor="middle" class="tiny">evidence unlocks next step</text>
+  <path class="line dash" d="M215 561V715"/>
+
+  <rect class="choice" x="90" y="835" width="520" height="64"/>
+  <text x="350" y="865" text-anchor="middle" class="small">Design rule: viewers collect partial truths from different paths.</text>
+  <text x="350" y="891" text-anchor="middle" class="tiny">choice structure mirrors detective reasoning</text>
+
+  <rect class="choice" x="660" y="835" width="520" height="64"/>
+  <text x="920" y="865" text-anchor="middle" class="small">Production rule: story map first, then 3D scenes and edited routes.</text>
+  <text x="920" y="891" text-anchor="middle" class="tiny">script / model / render / edit / publish</text>
+
+  <rect class="choice" x="1230" y="895" width="500" height="48"/>
+  <text x="1480" y="925" text-anchor="middle" class="tiny">Simplified from the original Chinese planning map for portfolio presentation.</text>
+</svg>
