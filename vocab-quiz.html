@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vocabulary Recall Trainer</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f6f7f9, #111318);
+      --panel: light-dark(#ffffff, #191d24);
+      --panel-2: light-dark(#eef2f7, #232936);
+      --text: light-dark(#17202e, #edf1f7);
+      --muted: light-dark(#5c6675, #a9b2c1);
+      --border: light-dark(#d8dee8, #343c4c);
+      --accent: light-dark(#0f766e, #2dd4bf);
+      --accent-strong: light-dark(#115e59, #5eead4);
+      --danger: light-dark(#b42318, #ff8a80);
+      --ok: light-dark(#15803d, #86efac);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .app {
+      width: min(1120px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 22px 0 28px;
+    }
+    header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+    .sub {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(76px, 1fr));
+      gap: 8px;
+      min-width: min(420px, 100%);
+    }
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 10px;
+    }
+    .stat b {
+      display: block;
+      font-size: 18px;
+      line-height: 1.1;
+    }
+    .stat span {
+      display: block;
+      margin-top: 3px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .controls {
+      display: grid;
+      gap: 12px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    select, input {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 7px;
+      padding: 9px 10px;
+      font: inherit;
+    }
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    button {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 7px;
+      padding: 10px 12px;
+      font: inherit;
+      cursor: pointer;
+      min-height: 40px;
+    }
+    button:hover { border-color: var(--accent); }
+    button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .danger { color: var(--danger); }
+    .good { color: var(--ok); }
+    .quiz {
+      min-height: 440px;
+      display: grid;
+      gap: 12px;
+    }
+    .card-main {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px;
+      min-height: 310px;
+      display: grid;
+      align-content: center;
+      gap: 18px;
+    }
+    .group {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .prompt {
+      font-size: clamp(30px, 6vw, 62px);
+      line-height: 1.05;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+    .prompt.definition {
+      font-size: clamp(22px, 3.2vw, 34px);
+      line-height: 1.25;
+      font-weight: 760;
+    }
+    .answer {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      color: var(--text);
+      font-size: 22px;
+      line-height: 1.35;
+      min-height: 56px;
+      overflow-wrap: anywhere;
+    }
+    .answer.hidden {
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .history {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .mini h2 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+    .list {
+      display: grid;
+      gap: 6px;
+      max-height: 210px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .item {
+      border-top: 1px solid var(--border);
+      padding-top: 6px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .item b { display: block; }
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    @media (max-width: 760px) {
+      header { display: grid; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .layout { grid-template-columns: 1fr; }
+      .actions { grid-template-columns: 1fr 1fr; }
+      .history { grid-template-columns: 1fr; }
+      .card-main { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>Vocabulary Recall Trainer</h1>
+        <div class="sub"><span id="deckCount"></span> words from the cleaned study list</div>
+      </div>
+      <section class="stats" aria-label="Session stats">
+        <div class="stat"><b id="seenCount">0</b><span>Reviewed</span></div>
+        <div class="stat"><b id="knownCount">0</b><span>Known</span></div>
+        <div class="stat"><b id="missedCount">0</b><span>Missed</span></div>
+        <div class="stat"><b id="accuracy">0%</b><span>Accuracy</span></div>
+      </section>
+    </header>
+    <section class="layout">
+      <aside class="panel controls">
+        <div>
+          <label for="groupSelect">Study Group</label>
+          <select id="groupSelect"></select>
+        </div>
+        <div>
+          <label>Quiz Direction</label>
+          <div class="segmented">
+            <button type="button" id="modeWord" class="active">Word → Meaning</button>
+            <button type="button" id="modeDef">Meaning → Word</button>
+          </div>
+        </div>
+        <div>
+          <label>Draw Mode</label>
+          <div class="segmented">
+            <button type="button" id="drawWeak" class="active">Prioritize Missed</button>
+            <button type="button" id="drawRandom">Random</button>
+          </div>
+        </div>
+        <div>
+          <label for="searchBox">Filter</label>
+          <input id="searchBox" type="search" placeholder="word or definition">
+        </div>
+        <button type="button" id="resetSession">Reset Session</button>
+        <button type="button" id="resetMemory" class="danger">Clear Saved Progress</button>
+      </aside>
+      <section class="quiz">
+        <article class="card-main" aria-live="polite">
+          <div class="group" id="currentGroup"></div>
+          <div class="prompt" id="promptText"></div>
+          <div class="answer hidden" id="answerText">Answer first, then reveal</div>
+        </article>
+        <div class="actions">
+          <button type="button" id="showAnswer" class="primary">Reveal Answer</button>
+          <button type="button" id="knowBtn">I Know It</button>
+          <button type="button" id="missBtn">Missed It</button>
+          <button type="button" id="nextBtn">Next Word</button>
+        </div>
+        <section class="history">
+          <div class="panel mini">
+            <h2>Missed This Session</h2>
+            <div class="list" id="missedList"></div>
+          </div>
+          <div class="panel mini">
+            <h2>Recently Reviewed</h2>
+            <div class="list" id="recentList"></div>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+  <script>
+    const WORDS = [{"group":"Agreement, Law, And Rules","word":"accommodation","definition":"compromise","original":""},{"group":"Agreement, Law, And Rules","word":"acquit","definition":"declare not guilty","original":""},{"group":"Agreement, Law, And Rules","word":"approbation","definition":"approval; praise","original":""},{"group":"Agreement, Law, And Rules","word":"breach","definition":"disobey","original":""},{"group":"Agreement, Law, And Rules","word":"cast","definition":"vote","original":""},{"group":"Agreement, Law, And Rules","word":"concede","definition":"admit","original":""},{"group":"Agreement, Law, And Rules","word":"condone","definition":"forgive","original":""},{"group":"Agreement, Law, And Rules","word":"consensus","definition":"general agreement","original":""},{"group":"Agreement, Law, And Rules","word":"default","definition":"failure to act; preset option","original":""},{"group":"Agreement, Law, And Rules","word":"enactment","definition":"passing into law; performance","original":""},{"group":"Agreement, Law, And Rules","word":"illicit","definition":"illegal","original":""},{"group":"Agreement, Law, And Rules","word":"infraction","definition":"violation; breach","original":""},{"group":"Agreement, Law, And Rules","word":"levy","definition":"impose or collect a tax","original":""},{"group":"Agreement, Law, And Rules","word":"mandate","definition":"official order; authority","original":""},{"group":"Agreement, Law, And Rules","word":"perpetrate","definition":"commit crime","original":""},{"group":"Agreement, Law, And Rules","word":"prescribe","definition":"order; recommend officially","original":""},{"group":"Agreement, Law, And Rules","word":"ratify","definition":"formally approve","original":""},{"group":"Agreement, Law, And Rules","word":"reprieve","definition":"temporary relief; delay of punishment","original":""},{"group":"Agreement, Law, And Rules","word":"seditious","definition":"inciting rebellion","original":""},{"group":"Agreement, Law, And Rules","word":"signatory","definition":"signer","original":""},{"group":"Agreement, Law, And Rules","word":"suffrage","definition":"voting right","original":""},{"group":"Agreement, Law, And Rules","word":"transgression","definition":"violation; offense","original":""},{"group":"Agreement, Law, And Rules","word":"treason","definition":"betrayal of one's country","original":""},{"group":"Agreement, Law, And Rules","word":"warrant","definition":"justify; authorization","original":""},{"group":"Appearance, Sound, And Senses","word":"bosom","definition":"chest","original":""},{"group":"Appearance, Sound, And Senses","word":"brow","definition":"forehead; edge of a hill","original":""},{"group":"Appearance, Sound, And Senses","word":"countenance","definition":"face","original":""},{"group":"Appearance, Sound, And Senses","word":"dainty","definition":"delicate and tiny","original":""},{"group":"Appearance, Sound, And Senses","word":"deface","definition":"destroy face","original":""},{"group":"Appearance, Sound, And Senses","word":"delectable","definition":"delicious","original":""},{"group":"Appearance, Sound, And Senses","word":"downy","definition":"fluffy","original":""},{"group":"Appearance, Sound, And Senses","word":"dulcet","definition":"melodic","original":""},{"group":"Appearance, Sound, And Senses","word":"dusky","definition":"dim","original":""},{"group":"Appearance, Sound, And Senses","word":"fragrant","definition":"redolent","original":""},{"group":"Appearance, Sound, And Senses","word":"lurid","definition":"shocking; sensational; vivid","original":""},{"group":"Appearance, Sound, And Senses","word":"olfactory","definition":"about nose","original":""},{"group":"Appearance, Sound, And Senses","word":"palpable","definition":"perceivable","original":""},{"group":"Appearance, Sound, And Senses","word":"pungent","definition":"sharp-smelling or sharp-tasting","original":""},{"group":"Appearance, Sound, And Senses","word":"shaggy","definition":"fluffy/untidy","original":""},{"group":"Appearance, Sound, And Senses","word":"sonorous","definition":"deep and resonant","original":""},{"group":"Appearance, Sound, And Senses","word":"spindly","definition":"long, thin, and weak","original":""},{"group":"Appearance, Sound, And Senses","word":"striking","definition":"attractive","original":""},{"group":"Appearance, Sound, And Senses","word":"stroke","definition":"try/touch/draw","original":""},{"group":"Appearance, Sound, And Senses","word":"subtle","definition":"delicate; not obvious","original":""},{"group":"Appearance, Sound, And Senses","word":"tactile","definition":"tangible","original":""},{"group":"Appearance, Sound, And Senses","word":"telegenic","definition":"attractive on television","original":""},{"group":"Appearance, Sound, And Senses","word":"viscous","definition":"sticky","original":""},{"group":"Character And Behavior","word":"appropriate","definition":"suitable; take for one's own","original":""},{"group":"Character And Behavior","word":"apt","definition":"likely; suitable","original":""},{"group":"Character And Behavior","word":"bedraggled","definition":"wet, limp, and untidy","original":""},{"group":"Character And Behavior","word":"boorish","definition":"rude","original":""},{"group":"Character And Behavior","word":"candor","definition":"honesty; frankness","original":""},{"group":"Character And Behavior","word":"capricious","definition":"random","original":""},{"group":"Character And Behavior","word":"cavalier","definition":"dismissive; offhand","original":""},{"group":"Character And Behavior","word":"complacent","definition":"self-satisfied; uncritically confident","original":""},{"group":"Character And Behavior","word":"conscientious","definition":"responsible","original":""},{"group":"Character And Behavior","word":"docile","definition":"easily managed; submissive","original":""},{"group":"Character And Behavior","word":"fallacy","definition":"fault","original":""},{"group":"Character And Behavior","word":"foible","definition":"fault","original":""},{"group":"Character And Behavior","word":"forthrightness","definition":"directness; honesty","original":""},{"group":"Character And Behavior","word":"gallant","definition":"brave","original":""},{"group":"Character And Behavior","word":"haphazard","definition":"random; disorderly","original":""},{"group":"Character And Behavior","word":"intrepid","definition":"brave","original":""},{"group":"Character And Behavior","word":"obdurate","definition":"stubborn","original":""},{"group":"Character And Behavior","word":"offhand","definition":"casual","original":""},{"group":"Character And Behavior","word":"pesky","definition":"annoying","original":""},{"group":"Character And Behavior","word":"pragmatic","definition":"practical","original":""},{"group":"Character And Behavior","word":"punctilious","definition":"meticulous","original":""},{"group":"Character And Behavior","word":"rash","definition":"reckless; skin eruption","original":""},{"group":"Character And Behavior","word":"recalcitrant","definition":"stubbornly resistant","original":""},{"group":"Character And Behavior","word":"reticent","definition":"reserved; quiet","original":""},{"group":"Character And Behavior","word":"self-effacement","definition":"humble","original":""},{"group":"Character And Behavior","word":"sensible","definition":"practical; reasonable","original":""},{"group":"Character And Behavior","word":"slovenly","definition":"untidy","original":""},{"group":"Character And Behavior","word":"stalwart","definition":"reliable","original":""},{"group":"Character And Behavior","word":"supercilious","definition":"arrogant","original":""},{"group":"Character And Behavior","word":"tenable","definition":"defensible; reasonable","original":""},{"group":"Character And Behavior","word":"torpid","definition":"sluggish","original":""},{"group":"Character And Behavior","word":"valiant","definition":"brave","original":""},{"group":"Criticism, Mockery, And Conflict","word":"animosity","definition":"enmity","original":""},{"group":"Criticism, Mockery, And Conflict","word":"banter","definition":"joke","original":""},{"group":"Criticism, Mockery, And Conflict","word":"brawl","definition":"fight","original":""},{"group":"Criticism, Mockery, And Conflict","word":"castigate","definition":"criticize","original":""},{"group":"Criticism, Mockery, And Conflict","word":"caustic","definition":"corrode/mean","original":""},{"group":"Criticism, Mockery, And Conflict","word":"censure","definition":"blame","original":""},{"group":"Criticism, Mockery, And Conflict","word":"decry","definition":"denounce","original":""},{"group":"Criticism, Mockery, And Conflict","word":"denigrate","definition":"belittle","original":""},{"group":"Criticism, Mockery, And Conflict","word":"deride","definition":"mock","original":""},{"group":"Criticism, Mockery, And Conflict","word":"detractor","definition":"critic; disparager","original":""},{"group":"Criticism, Mockery, And Conflict","word":"disparage","definition":"belittle","original":""},{"group":"Criticism, Mockery, And Conflict","word":"dwarf","definition":"belittle","original":""},{"group":"Criticism, Mockery, And Conflict","word":"feud","definition":"hatred","original":""},{"group":"Criticism, Mockery, And Conflict","word":"nemesis","definition":"opponent","original":""},{"group":"Criticism, Mockery, And Conflict","word":"pan","definition":"criticize","original":""},{"group":"Criticism, Mockery, And Conflict","word":"parody","definition":"mimic","original":""},{"group":"Criticism, Mockery, And Conflict","word":"pun","definition":"two in one","original":""},{"group":"Criticism, Mockery, And Conflict","word":"rebuke","definition":"reprimand/blame","original":""},{"group":"Criticism, Mockery, And Conflict","word":"repulse","definition":"drive back; disgust","original":""},{"group":"Criticism, Mockery, And Conflict","word":"satire","definition":"sarcastic","original":""},{"group":"Criticism, Mockery, And Conflict","word":"scathing","definition":"harsh; severe","original":""},{"group":"Criticism, Mockery, And Conflict","word":"sordid","definition":"dirty; morally low","original":""},{"group":"Criticism, Mockery, And Conflict","word":"stricture","definition":"restriction; severe criticism","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"artifice","definition":"contrivance","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"belie","definition":"contradict; give a false impression","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"bionic","definition":"artificial device to simulate animal biology","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"clandestine","definition":"secretive","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"contrived","definition":"artificial; forced","original":"contived"},{"group":"Deceit, Secrecy, And Artificiality","word":"counterfeit","definition":"fake","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"devious","definition":"sly","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"dupe","definition":"trick; deceive","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"feign","definition":"fake","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"fictitious","definition":"fictional","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"finesse","definition":"trick","original":"finess"},{"group":"Deceit, Secrecy, And Artificiality","word":"forge","definition":"fake","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"gimmick","definition":"trick; attention-getting device","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"guile","definition":"deceitful cleverness","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"hoax","definition":"lie","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"knack","definition":"trick","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"spurious","definition":"fake","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"surreptitious","definition":"secretly","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"ulterior","definition":"hidden","original":""},{"group":"Deceit, Secrecy, And Artificiality","word":"weep","definition":"fake weep","original":"beweep"},{"group":"Desire, Appeal, And Motivation","word":"allure","definition":"attract","original":""},{"group":"Desire, Appeal, And Motivation","word":"beckon","definition":"summon","original":""},{"group":"Desire, Appeal, And Motivation","word":"covet","definition":"want","original":""},{"group":"Desire, Appeal, And Motivation","word":"enthralling","definition":"attracting","original":""},{"group":"Desire, Appeal, And Motivation","word":"entice","definition":"attract","original":""},{"group":"Desire, Appeal, And Motivation","word":"entreat","definition":"beg","original":""},{"group":"Desire, Appeal, And Motivation","word":"exhilarate","definition":"excite","original":""},{"group":"Desire, Appeal, And Motivation","word":"impetus","definition":"motivation","original":""},{"group":"Desire, Appeal, And Motivation","word":"implore","definition":"beg","original":""},{"group":"Desire, Appeal, And Motivation","word":"mesmerizing","definition":"attracting","original":""},{"group":"Desire, Appeal, And Motivation","word":"prime","definition":"stimulate","original":""},{"group":"Desire, Appeal, And Motivation","word":"spur","definition":"stimulate","original":""},{"group":"Desire, Appeal, And Motivation","word":"whet","definition":"sharpen; stimulate","original":""},{"group":"Desire, Appeal, And Motivation","word":"yearn","definition":"longing","original":""},{"group":"Emotion And Temperament","word":"allay","definition":"calm; relieve","original":""},{"group":"Emotion And Temperament","word":"ardent","definition":"passionate; fervent","original":""},{"group":"Emotion And Temperament","word":"bliss","definition":"happiness; pleasure","original":""},{"group":"Emotion And Temperament","word":"consternation","definition":"fear","original":""},{"group":"Emotion And Temperament","word":"convivial","definition":"joyful","original":""},{"group":"Emotion And Temperament","word":"daze","definition":"zone out","original":""},{"group":"Emotion And Temperament","word":"demonstrative","definition":"openly showing feeling","original":""},{"group":"Emotion And Temperament","word":"discontent","definition":"dissatisfied","original":""},{"group":"Emotion And Temperament","word":"dishearten","definition":"disappoint","original":""},{"group":"Emotion And Temperament","word":"equanimity","definition":"calm","original":""},{"group":"Emotion And Temperament","word":"fervent","definition":"passionate","original":""},{"group":"Emotion And Temperament","word":"foreboding","definition":"sense of coming trouble","original":""},{"group":"Emotion And Temperament","word":"gratification","definition":"satisfaction; pleasure","original":""},{"group":"Emotion And Temperament","word":"grogginess","definition":"drowsiness; dazed feeling","original":""},{"group":"Emotion And Temperament","word":"instill","definition":"gradually implant an idea or feeling","original":""},{"group":"Emotion And Temperament","word":"jaded","definition":"tired","original":""},{"group":"Emotion And Temperament","word":"livid","definition":"furious","original":""},{"group":"Emotion And Temperament","word":"mirth","definition":"happiness","original":""},{"group":"Emotion And Temperament","word":"penitent","definition":"repentant; remorseful","original":""},{"group":"Emotion And Temperament","word":"qualm","definition":"worry","original":""},{"group":"Emotion And Temperament","word":"reverence","definition":"awe","original":""},{"group":"Emotion And Temperament","word":"ruefully","definition":"sadly","original":""},{"group":"Emotion And Temperament","word":"sentiment","definition":"point of view/emotion","original":""},{"group":"Emotion And Temperament","word":"solace","definition":"comfort","original":""},{"group":"Emotion And Temperament","word":"stupor","definition":"coma","original":""},{"group":"Emotion And Temperament","word":"temperament","definition":"disposition","original":""},{"group":"Emotion And Temperament","word":"tinge","definition":"slight trace of color or feeling","original":""},{"group":"Emotion And Temperament","word":"weary","definition":"tired","original":""},{"group":"Emotion And Temperament","word":"wretched","definition":"sad","original":""},{"group":"Emotion And Temperament","word":"zeal","definition":"passion","original":""},{"group":"General Study Words","word":"adverse","definition":"disadvantageous","original":""},{"group":"General Study Words","word":"agent","definition":"active substance; representative","original":""},{"group":"General Study Words","word":"akin","definition":"similar","original":""},{"group":"General Study Words","word":"assimilate","definition":"absorb; integrate","original":""},{"group":"General Study Words","word":"averse","definition":"strongly opposed","original":""},{"group":"General Study Words","word":"balmy","definition":"gentle","original":""},{"group":"General Study Words","word":"banal","definition":"ordinary; clichéd","original":""},{"group":"General Study Words","word":"bask","definition":"shower/enjoy","original":""},{"group":"General Study Words","word":"behold","definition":"see","original":""},{"group":"General Study Words","word":"benign","definition":"gentle","original":""},{"group":"General Study Words","word":"bland","definition":"boring","original":""},{"group":"General Study Words","word":"blatantly","definition":"openly; obviously","original":""},{"group":"General Study Words","word":"blemish","definition":"taint","original":""},{"group":"General Study Words","word":"boast","definition":"brag; possess proudly","original":""},{"group":"General Study Words","word":"bound","definition":"heading toward; certain to","original":""},{"group":"General Study Words","word":"captivity","definition":"locked","original":""},{"group":"General Study Words","word":"categorical","definition":"absolute","original":""},{"group":"General Study Words","word":"catharsis","definition":"emotional release","original":""},{"group":"General Study Words","word":"cathartic","definition":"emotionally cleansing; purgative","original":"catharic"},{"group":"General Study Words","word":"cede","definition":"relinquish","original":""},{"group":"General Study Words","word":"chafe","definition":"rub painfully; irritate","original":""},{"group":"General Study Words","word":"coagulate","definition":"freeze","original":""},{"group":"General Study Words","word":"compact","definition":"tightly connected","original":""},{"group":"General Study Words","word":"concerted","definition":"coordinated; jointly planned","original":""},{"group":"General Study Words","word":"conciliatory","definition":"intended to placate","original":"concillatory"},{"group":"General Study Words","word":"courtship","definition":"wooing","original":""},{"group":"General Study Words","word":"crisscross","definition":"crossmoving","original":""},{"group":"General Study Words","word":"crude","definition":"raw","original":""},{"group":"General Study Words","word":"cuisine","definition":"style of cooking","original":""},{"group":"General Study Words","word":"daunting","definition":"frightening","original":""},{"group":"General Study Words","word":"deed","definition":"action","original":""},{"group":"General Study Words","word":"demur","definition":"argue against","original":""},{"group":"General Study Words","word":"depression","definition":"pit","original":""},{"group":"General Study Words","word":"derivative","definition":"imitative; derived from another source","original":"derivtive"},{"group":"General Study Words","word":"descry","definition":"see","original":""},{"group":"General Study Words","word":"desultory","definition":"aimless","original":""},{"group":"General Study Words","word":"deter","definition":"scare","original":""},{"group":"General Study Words","word":"diabolical","definition":"devil-like","original":""},{"group":"General Study Words","word":"diametrically","definition":"oppositely","original":""},{"group":"General Study Words","word":"disconcerting","definition":"unnerving/perplexing","original":""},{"group":"General Study Words","word":"disinterested","definition":"fair","original":""},{"group":"General Study Words","word":"disparate","definition":"different","original":""},{"group":"General Study Words","word":"dissension","definition":"disagreement; conflict","original":"dissention"},{"group":"General Study Words","word":"dissenter","definition":"one who disagrees","original":""},{"group":"General Study Words","word":"distinction","definition":"difference","original":""},{"group":"General Study Words","word":"douse","definition":"extinguish","original":""},{"group":"General Study Words","word":"downplay","definition":"make seem less important","original":""},{"group":"General Study Words","word":"doze","definition":"nap","original":""},{"group":"General Study Words","word":"dreadful","definition":"frightening","original":""},{"group":"General Study Words","word":"drowse","definition":"doze","original":""},{"group":"General Study Words","word":"dully","definition":"in a dull manner","original":""},{"group":"General Study Words","word":"duly","definition":"appropriately","original":""},{"group":"General Study Words","word":"eccentric","definition":"strange; unusual","original":""},{"group":"General Study Words","word":"eclectic","definition":"deriving ideas from a wide range","original":""},{"group":"General Study Words","word":"eclipse","definition":"dim","original":""},{"group":"General Study Words","word":"elapse","definition":"flow","original":""},{"group":"General Study Words","word":"encroachment","definition":"gradual intrusion","original":"enroachment"},{"group":"General Study Words","word":"enliven","definition":"make interesting","original":""},{"group":"General Study Words","word":"ensconce","definition":"settle","original":""},{"group":"General Study Words","word":"episodic","definition":"occurring in episodes","original":""},{"group":"General Study Words","word":"epitomize","definition":"typical","original":"eptomize"},{"group":"General Study Words","word":"esoteric","definition":"abstruse/profound","original":""},{"group":"General Study Words","word":"estrangement","definition":"isolate/exclude","original":""},{"group":"General Study Words","word":"ethos","definition":"spirit","original":""},{"group":"General Study Words","word":"evince","definition":"show clearly","original":""},{"group":"General Study Words","word":"evocative","definition":"bringing memories or feelings to mind","original":""},{"group":"General Study Words","word":"exacting","definition":"demanding; strict","original":""},{"group":"General Study Words","word":"exile","definition":"banish","original":""},{"group":"General Study Words","word":"exorbitant","definition":"too high","original":""},{"group":"General Study Words","word":"explicable","definition":"explainable","original":""},{"group":"General Study Words","word":"exponent","definition":"proponent","original":""},{"group":"General Study Words","word":"extort","definition":"ransom","original":""},{"group":"General Study Words","word":"extraneous","definition":"irrelevant","original":""},{"group":"General Study Words","word":"extravagant","definition":"excessive; wasteful","original":""},{"group":"General Study Words","word":"facetious","definition":"joking","original":""},{"group":"General Study Words","word":"fateful","definition":"momentous","original":""},{"group":"General Study Words","word":"feat","definition":"achievement","original":""},{"group":"General Study Words","word":"fecal","definition":"relating to feces","original":""},{"group":"General Study Words","word":"felicitous","definition":"fitting","original":""},{"group":"General Study Words","word":"foreground","definition":"emphasize","original":""},{"group":"General Study Words","word":"forgo","definition":"waive","original":""},{"group":"General Study Words","word":"founder","definition":"fail/drown","original":""},{"group":"General Study Words","word":"frigid","definition":"very cold; unemotional","original":""},{"group":"General Study Words","word":"frivolous","definition":"lacking seriousness","original":""},{"group":"General Study Words","word":"fume","definition":"vapor; rage","original":""},{"group":"General Study Words","word":"garner","definition":"glean","original":""},{"group":"General Study Words","word":"generic","definition":"general; not specific","original":""},{"group":"General Study Words","word":"grandiose","definition":"ostentatious/pompous","original":""},{"group":"General Study Words","word":"granted","definition":"although","original":""},{"group":"General Study Words","word":"groom","definition":"tidy up","original":""},{"group":"General Study Words","word":"grudgingly","definition":"unwillingly/reluctantcly","original":""},{"group":"General Study Words","word":"gush","definition":"flood","original":""},{"group":"General Study Words","word":"harbinger","definition":"omen","original":""},{"group":"General Study Words","word":"heed","definition":"attention/conform","original":""},{"group":"General Study Words","word":"hermit","definition":"hider","original":""},{"group":"General Study Words","word":"hew","definition":"cut/carve","original":""},{"group":"General Study Words","word":"hew out","definition":"create","original":""},{"group":"General Study Words","word":"holistic","definition":"overall","original":""},{"group":"General Study Words","word":"hone","definition":"sharpen","original":""},{"group":"General Study Words","word":"hush","definition":"quiet","original":""},{"group":"General Study Words","word":"idiosyncratic","definition":"unique","original":""},{"group":"General Study Words","word":"imbibe","definition":"absorb","original":""},{"group":"General Study Words","word":"immaterial","definition":"unimportant","original":""},{"group":"General Study Words","word":"impervious","definition":"not affected by; not allowing through","original":""},{"group":"General Study Words","word":"implausible","definition":"unbelievable","original":""},{"group":"General Study Words","word":"importunate","definition":"annoyingly persistent","original":""},{"group":"General Study Words","word":"impugn","definition":"doubt","original":""},{"group":"General Study Words","word":"impulsive","definition":"rushing","original":""},{"group":"General Study Words","word":"inadvertently","definition":"unintentionally","original":""},{"group":"General Study Words","word":"inarticulate","definition":"speak unclearly","original":""},{"group":"General Study Words","word":"inception","definition":"start","original":""},{"group":"General Study Words","word":"incessantly","definition":"continuously","original":""},{"group":"General Study Words","word":"indisputable","definition":"undebatable","original":""},{"group":"General Study Words","word":"induction","definition":"formal introduction; inference","original":""},{"group":"General Study Words","word":"ineluctable","definition":"unavoidable","original":""},{"group":"General Study Words","word":"inexorably","definition":"heartlessly/unstoppable","original":""},{"group":"General Study Words","word":"infuse","definition":"fill in","original":""},{"group":"General Study Words","word":"ingenuity","definition":"creativity","original":""},{"group":"General Study Words","word":"ingenuous","definition":"naïve","original":""},{"group":"General Study Words","word":"inherently","definition":"in nature","original":""},{"group":"General Study Words","word":"inquisitive","definition":"curious","original":""},{"group":"General Study Words","word":"instigator","definition":"stimulator","original":""},{"group":"General Study Words","word":"insular","definition":"isolate","original":""},{"group":"General Study Words","word":"intact","definition":"complete","original":""},{"group":"General Study Words","word":"inter","definition":"bury","original":""},{"group":"General Study Words","word":"intercede","definition":"mediate","original":""},{"group":"General Study Words","word":"interject","definition":"interrupt with a remark","original":""},{"group":"General Study Words","word":"interpolate","definition":"insert; estimate between known points","original":""},{"group":"General Study Words","word":"intoxication","definition":"drunkenness; strong excitement","original":""},{"group":"General Study Words","word":"intrinsic","definition":"born with","original":""},{"group":"General Study Words","word":"inure","definition":"become accustomed to","original":""},{"group":"General Study Words","word":"irritable","definition":"easy to get angry","original":""},{"group":"General Study Words","word":"jibe","definition":"agree; fit; mocking remark","original":""},{"group":"General Study Words","word":"kindred","definition":"similar","original":""},{"group":"General Study Words","word":"lank","definition":"skinny","original":""},{"group":"General Study Words","word":"lap","definition":"pat","original":""},{"group":"General Study Words","word":"lash","definition":"strike; whip; tie","original":""},{"group":"General Study Words","word":"latch","definition":"grasp","original":""},{"group":"General Study Words","word":"latent","definition":"potential","original":""},{"group":"General Study Words","word":"legislator","definition":"person who makes laws","original":""},{"group":"General Study Words","word":"lineament","definition":"distinctive feature; facial outline","original":""},{"group":"General Study Words","word":"listlessly","definition":"tiredly","original":""},{"group":"General Study Words","word":"lobby","definition":"persuade","original":""},{"group":"General Study Words","word":"lodging","definition":"temporal accommodation","original":""},{"group":"General Study Words","word":"loom","definition":"appear indistinctly; threaten","original":""},{"group":"General Study Words","word":"loquacious","definition":"elloquent","original":""},{"group":"General Study Words","word":"lore","definition":"myth","original":""},{"group":"General Study Words","word":"lush","definition":"exuberant","original":""},{"group":"General Study Words","word":"magnate","definition":"wealthy person","original":""},{"group":"General Study Words","word":"makeup","definition":"constitution","original":""},{"group":"General Study Words","word":"mania","definition":"frenzy","original":""},{"group":"General Study Words","word":"mannerism","definition":"habit","original":""},{"group":"General Study Words","word":"medial","definition":"middle","original":""},{"group":"General Study Words","word":"mercurial","definition":"variable","original":""},{"group":"General Study Words","word":"mettle","definition":"courage","original":""},{"group":"General Study Words","word":"mime","definition":"mimic","original":""},{"group":"General Study Words","word":"mimetic","definition":"mimic","original":""},{"group":"General Study Words","word":"minutely","definition":"carefully","original":""},{"group":"General Study Words","word":"mortify","definition":"embarrassed","original":""},{"group":"General Study Words","word":"motif","definition":"recurring idea or pattern","original":""},{"group":"General Study Words","word":"munificence","definition":"generosity","original":""},{"group":"General Study Words","word":"myopic","definition":"shortsighted; narrow-minded","original":""},{"group":"General Study Words","word":"nadir","definition":"lowest point","original":""},{"group":"General Study Words","word":"nascent","definition":"newly formed","original":""},{"group":"General Study Words","word":"nebulous","definition":"blurry","original":""},{"group":"General Study Words","word":"nondescript","definition":"normal","original":""},{"group":"General Study Words","word":"notably","definition":"especially","original":""},{"group":"General Study Words","word":"nuance","definition":"subtle difference","original":""},{"group":"General Study Words","word":"nuanced","definition":"carefully considered","original":""},{"group":"General Study Words","word":"nuisance","definition":"annoyance; bother","original":""},{"group":"General Study Words","word":"observant","definition":"watchful; attentive","original":""},{"group":"General Study Words","word":"obviate","definition":"make unnecessary","original":""},{"group":"General Study Words","word":"ostensibly","definition":"seemingly","original":""},{"group":"General Study Words","word":"outlandishly","definition":"oddly","original":""},{"group":"General Study Words","word":"outlook","definition":"point of view","original":""},{"group":"General Study Words","word":"overarching","definition":"comprehensive","original":""},{"group":"General Study Words","word":"overbearing","definition":"domineering","original":""},{"group":"General Study Words","word":"overblown","definition":"exaggerated","original":""},{"group":"General Study Words","word":"overlie","definition":"cover","original":""},{"group":"General Study Words","word":"oversee","definition":"invigilate","original":""},{"group":"General Study Words","word":"overwrought","definition":"over nervous","original":""},{"group":"General Study Words","word":"panacea","definition":"cure-all","original":""},{"group":"General Study Words","word":"paradigm","definition":"model; typical example","original":""},{"group":"General Study Words","word":"paragon","definition":"example","original":""},{"group":"General Study Words","word":"parochial","definition":"narrow","original":""},{"group":"General Study Words","word":"pastoral","definition":"countryside","original":"pastrol"},{"group":"General Study Words","word":"pathos","definition":"quality that evokes pity or sadness","original":""},{"group":"General Study Words","word":"paucity","definition":"lack","original":""},{"group":"General Study Words","word":"pedantic","definition":"nerdy","original":""},{"group":"General Study Words","word":"penchant","definition":"tendency","original":""},{"group":"General Study Words","word":"percolate","definition":"filter/osmosis","original":""},{"group":"General Study Words","word":"perfunctory","definition":"done with little care","original":""},{"group":"General Study Words","word":"persevere","definition":"persist","original":"perserve"},{"group":"General Study Words","word":"pertain","definition":"relate; apply","original":""},{"group":"General Study Words","word":"petrify","definition":"scared","original":""},{"group":"General Study Words","word":"pique","definition":"provoke","original":""},{"group":"General Study Words","word":"pitch","definition":"ground/throw","original":""},{"group":"General Study Words","word":"placate","definition":"appease","original":""},{"group":"General Study Words","word":"placebo","definition":"inactive treatment","original":""},{"group":"General Study Words","word":"plaint","definition":"complaint; lament","original":""},{"group":"General Study Words","word":"pledge","definition":"promise","original":""},{"group":"General Study Words","word":"poignant","definition":"deeply moving; touching","original":"poigant"},{"group":"General Study Words","word":"polymath","definition":"savant","original":""},{"group":"General Study Words","word":"posthumous","definition":"after death","original":""},{"group":"General Study Words","word":"potency","definition":"efficacy","original":""},{"group":"General Study Words","word":"potent","definition":"powerful","original":""},{"group":"General Study Words","word":"precedent","definition":"predated example","original":""},{"group":"General Study Words","word":"precipitate","definition":"cause suddenly; hasten","original":""},{"group":"General Study Words","word":"precipitous","definition":"steep","original":"precipitious"},{"group":"General Study Words","word":"precocious","definition":"premmatured","original":""},{"group":"General Study Words","word":"precursor","definition":"ancestor","original":""},{"group":"General Study Words","word":"preen","definition":"groom oneself; show off","original":""},{"group":"General Study Words","word":"prefatory","definition":"introductory; serving as a preface","original":"prefactory"},{"group":"General Study Words","word":"prefigure","definition":"foreshadow","original":""},{"group":"General Study Words","word":"premeditate","definition":"plan beforehand","original":"premediate"},{"group":"General Study Words","word":"preposterous","definition":"absurd","original":""},{"group":"General Study Words","word":"presage","definition":"omen","original":""},{"group":"General Study Words","word":"prescient","definition":"prophetic/farsighted","original":""},{"group":"General Study Words","word":"presumptuous","definition":"too bold; overstepping","original":""},{"group":"General Study Words","word":"primeval","definition":"primitive","original":"preimeval"},{"group":"General Study Words","word":"prodigal","definition":"wasteful","original":""},{"group":"General Study Words","word":"proffer","definition":"provide","original":""},{"group":"General Study Words","word":"project","definition":"predict","original":""},{"group":"General Study Words","word":"pronghorn","definition":"North American hoofed mammal","original":""},{"group":"General Study Words","word":"prosaic","definition":"boring/comman","original":""},{"group":"General Study Words","word":"prospect","definition":"potential","original":""},{"group":"General Study Words","word":"protrude","definition":"reach out","original":""},{"group":"General Study Words","word":"provincial","definition":"narrow-minded","original":""},{"group":"General Study Words","word":"prowl","definition":"sneak","original":""},{"group":"General Study Words","word":"queer","definition":"weird","original":""},{"group":"General Study Words","word":"quench","definition":"extinguish/douse","original":""},{"group":"General Study Words","word":"quintessential","definition":"typical","original":""},{"group":"General Study Words","word":"ramification","definition":"result","original":"ramificaition"},{"group":"General Study Words","word":"realm","definition":"domain","original":""},{"group":"General Study Words","word":"reckoning","definition":"calculating","original":""},{"group":"General Study Words","word":"recoup","definition":"regain/reimbursed","original":""},{"group":"General Study Words","word":"recreation","definition":"entertainment","original":""},{"group":"General Study Words","word":"register","definition":"show","original":""},{"group":"General Study Words","word":"relinquish","definition":"give up","original":"relingquish"},{"group":"General Study Words","word":"remediable","definition":"rectifiable","original":""},{"group":"General Study Words","word":"rendition","definition":"performance","original":""},{"group":"General Study Words","word":"renounce","definition":"give up","original":""},{"group":"General Study Words","word":"renunciation","definition":"give up","original":""},{"group":"General Study Words","word":"repine","definition":"complain; feel discontented","original":""},{"group":"General Study Words","word":"repose","definition":"rest","original":""},{"group":"General Study Words","word":"rescind","definition":"cancel","original":"recscind"},{"group":"General Study Words","word":"resigned","definition":"accepting something unpleasant","original":""},{"group":"General Study Words","word":"resourceful","definition":"clever; skillful","original":""},{"group":"General Study Words","word":"reverberate","definition":"echo","original":""},{"group":"General Study Words","word":"revolt","definition":"resist","original":""},{"group":"General Study Words","word":"righteousness","definition":"justice","original":""},{"group":"General Study Words","word":"rote","definition":"memorizing repetitively","original":""},{"group":"General Study Words","word":"salutary","definition":"beneficial; healthful","original":""},{"group":"General Study Words","word":"sanctuary","definition":"shield","original":"sancutuary"},{"group":"General Study Words","word":"sanguine","definition":"optimistic","original":""},{"group":"General Study Words","word":"saturate","definition":"soak","original":""},{"group":"General Study Words","word":"savvy","definition":"prudent","original":""},{"group":"General Study Words","word":"scrawl","definition":"doodle","original":""},{"group":"General Study Words","word":"seclusion","definition":"isolation","original":""},{"group":"General Study Words","word":"seep","definition":"ooze slowly","original":""},{"group":"General Study Words","word":"segregation","definition":"separation of groups","original":""},{"group":"General Study Words","word":"seminal","definition":"highly influential; original","original":""},{"group":"General Study Words","word":"sequester","definition":"quarantine","original":""},{"group":"General Study Words","word":"serene","definition":"peaceful","original":""},{"group":"General Study Words","word":"serpentine","definition":"sinuous","original":""},{"group":"General Study Words","word":"shorthand","definition":"quick notes","original":""},{"group":"General Study Words","word":"shrewd","definition":"sharp and clever; skillful","original":""},{"group":"General Study Words","word":"shroud","definition":"cover","original":""},{"group":"General Study Words","word":"singular","definition":"special","original":""},{"group":"General Study Words","word":"siphon","definition":"draw off through a tube; divert","original":""},{"group":"General Study Words","word":"skew","definition":"twist","original":""},{"group":"General Study Words","word":"slant","definition":"tendency","original":""},{"group":"General Study Words","word":"slapstick","definition":"physical, exaggerated comedy","original":""},{"group":"General Study Words","word":"slight","definition":"ignore","original":""},{"group":"General Study Words","word":"smudge","definition":"make dirty","original":""},{"group":"General Study Words","word":"snare","definition":"trap","original":""},{"group":"General Study Words","word":"snippet","definition":"cut","original":""},{"group":"General Study Words","word":"sociable","definition":"amiable","original":""},{"group":"General Study Words","word":"specious","definition":"seem true while not","original":""},{"group":"General Study Words","word":"speck","definition":"dots","original":""},{"group":"General Study Words","word":"spurt","definition":"explode","original":""},{"group":"General Study Words","word":"squander","definition":"waste","original":""},{"group":"General Study Words","word":"stamina","definition":"resilience","original":""},{"group":"General Study Words","word":"steep","definition":"immerse","original":""},{"group":"General Study Words","word":"sterol","definition":"type of organic lipid, such as cholesterol","original":""},{"group":"General Study Words","word":"stilted","definition":"rigid","original":""},{"group":"General Study Words","word":"straddle","definition":"sit or stand across","original":""},{"group":"General Study Words","word":"strain","definition":"melody/breed","original":""},{"group":"General Study Words","word":"strident","definition":"jarring","original":""},{"group":"General Study Words","word":"strike","definition":"hit; impress; reach suddenly","original":""},{"group":"General Study Words","word":"stringent","definition":"harsh; severe","original":""},{"group":"General Study Words","word":"strip","definition":"comic","original":""},{"group":"General Study Words","word":"submissiveness","definition":"conformity","original":""},{"group":"General Study Words","word":"subsume","definition":"included","original":""},{"group":"General Study Words","word":"succumb","definition":"yield; die from","original":""},{"group":"General Study Words","word":"suffice","definition":"be enough","original":""},{"group":"General Study Words","word":"sullenness","definition":"upset","original":"sulleness"},{"group":"General Study Words","word":"sultry","definition":"stifling","original":""},{"group":"General Study Words","word":"suspicion","definition":"doubt; mistrust","original":""},{"group":"General Study Words","word":"swoon","definition":"revel","original":""},{"group":"General Study Words","word":"teem","definition":"full of","original":""},{"group":"General Study Words","word":"tellingly","definition":"revealingly; significantly","original":""},{"group":"General Study Words","word":"tenacious","definition":"determined/clinging/retentive","original":""},{"group":"General Study Words","word":"tend","definition":"take care of","original":""},{"group":"General Study Words","word":"tenuous","definition":"uncertain","original":""},{"group":"General Study Words","word":"tepid","definition":"lukewarm/warmish","original":""},{"group":"General Study Words","word":"tint","definition":"colored","original":""},{"group":"General Study Words","word":"toggle","definition":"swap","original":""},{"group":"General Study Words","word":"toll","definition":"cost","original":""},{"group":"General Study Words","word":"torpor","definition":"sluggishness; inactivity","original":""},{"group":"General Study Words","word":"trample","definition":"step","original":""},{"group":"General Study Words","word":"transpire","definition":"happen; become known","original":""},{"group":"General Study Words","word":"trifling","definition":"trivial","original":"trifiling"},{"group":"General Study Words","word":"triteness/trite","definition":"cliché","original":""},{"group":"General Study Words","word":"trophic","definition":"nutritional","original":""},{"group":"General Study Words","word":"truncate","definition":"cut","original":""},{"group":"General Study Words","word":"tutelage","definition":"tutoring","original":""},{"group":"General Study Words","word":"unblemished","definition":"perfect","original":""},{"group":"General Study Words","word":"undulate","definition":"waving","original":""},{"group":"General Study Words","word":"unfettered","definition":"unrestricted","original":""},{"group":"General Study Words","word":"ungainly","definition":"awkward; clumsy","original":""},{"group":"General Study Words","word":"unobtrusive","definition":"unobvious","original":""},{"group":"General Study Words","word":"unravel","definition":"untangle","original":""},{"group":"General Study Words","word":"unwind","definition":"relax","original":""},{"group":"General Study Words","word":"upend","definition":"subvert","original":""},{"group":"General Study Words","word":"uproarious","definition":"noisy","original":""},{"group":"General Study Words","word":"upstart","definition":"parvenu/Arriviste","original":""},{"group":"General Study Words","word":"vacillate","definition":"waver; be indecisive","original":""},{"group":"General Study Words","word":"vaudeville","definition":"funny comedy","original":""},{"group":"General Study Words","word":"vaunt","definition":"brag","original":""},{"group":"General Study Words","word":"vehement","definition":"strong","original":""},{"group":"General Study Words","word":"vet","definition":"scrutinize","original":""},{"group":"General Study Words","word":"vibrant","definition":"active","original":""},{"group":"General Study Words","word":"vicariously","definition":"indirectly","original":""},{"group":"General Study Words","word":"vices","definition":"bad habits; immoral practices","original":""},{"group":"General Study Words","word":"visceral","definition":"instinctive; deeply felt","original":""},{"group":"General Study Words","word":"volition","definition":"will","original":""},{"group":"General Study Words","word":"volitional","definition":"done by choice; willful","original":"colitional"},{"group":"General Study Words","word":"warranted","definition":"necessary","original":""},{"group":"General Study Words","word":"wayward","definition":"headstrong","original":""},{"group":"General Study Words","word":"winding","definition":"sinuous","original":""},{"group":"General Study Words","word":"winnow","definition":"sift","original":""},{"group":"General Study Words","word":"withal","definition":"also","original":""},{"group":"General Study Words","word":"withstand","definition":"tolerate","original":""},{"group":"General Study Words","word":"wreak","definition":"cause; inflict","original":""},{"group":"General Study Words","word":"zenith","definition":"apex","original":""},{"group":"Groups, Society, And People","word":"affiliate","definition":"subordinate organisation","original":""},{"group":"Groups, Society, And People","word":"camaraderie","definition":"friendship","original":""},{"group":"Groups, Society, And People","word":"clan","definition":"family group","original":""},{"group":"Groups, Society, And People","word":"clergyperson","definition":"leader of religious group","original":""},{"group":"Groups, Society, And People","word":"cohort","definition":"group","original":""},{"group":"Groups, Society, And People","word":"constellation","definition":"group","original":""},{"group":"Groups, Society, And People","word":"denizen","definition":"local","original":""},{"group":"Groups, Society, And People","word":"guild","definition":"union","original":""},{"group":"Groups, Society, And People","word":"horde","definition":"group","original":""},{"group":"Groups, Society, And People","word":"legion","definition":"very many; large group","original":""},{"group":"Groups, Society, And People","word":"oligarchy","definition":"elite group dominated","original":""},{"group":"Groups, Society, And People","word":"patriarchy","definition":"men dominated","original":""},{"group":"Groups, Society, And People","word":"populace","definition":"the general public","original":""},{"group":"Groups, Society, And People","word":"solidarity","definition":"cohesion","original":""},{"group":"Groups, Society, And People","word":"tact","definition":"skill in dealing with people","original":""},{"group":"Groups, Society, And People","word":"throng","definition":"gather","original":""},{"group":"Growth, Decline, And Change","word":"abatement","definition":"reduction; lessening","original":""},{"group":"Growth, Decline, And Change","word":"assuage","definition":"ease","original":""},{"group":"Growth, Decline, And Change","word":"atrophy","definition":"shrivel","original":""},{"group":"Growth, Decline, And Change","word":"attrition","definition":"gradual reduction","original":""},{"group":"Growth, Decline, And Change","word":"burgeon","definition":"grow rapidly; flourish","original":""},{"group":"Growth, Decline, And Change","word":"cessation","definition":"stop","original":""},{"group":"Growth, Decline, And Change","word":"culminate","definition":"at climax/ended","original":""},{"group":"Growth, Decline, And Change","word":"debilitate","definition":"weaken","original":""},{"group":"Growth, Decline, And Change","word":"deteriorate","definition":"worsen","original":""},{"group":"Growth, Decline, And Change","word":"disseminate","definition":"spread","original":""},{"group":"Growth, Decline, And Change","word":"dwindle","definition":"shrink","original":""},{"group":"Growth, Decline, And Change","word":"morph","definition":"transform","original":""},{"group":"Growth, Decline, And Change","word":"proliferation","definition":"spread","original":""},{"group":"Growth, Decline, And Change","word":"resurgence","definition":"revival; renewed increase","original":""},{"group":"Growth, Decline, And Change","word":"stagnant","definition":"paused","original":""},{"group":"Growth, Decline, And Change","word":"stall","definition":"delay; stop temporarily","original":""},{"group":"Growth, Decline, And Change","word":"subside","definition":"ease","original":""},{"group":"Growth, Decline, And Change","word":"surge","definition":"increase","original":""},{"group":"Growth, Decline, And Change","word":"taper","definition":"shrink","original":""},{"group":"Growth, Decline, And Change","word":"upheaval","definition":"big change","original":""},{"group":"Growth, Decline, And Change","word":"virality","definition":"rapid spread, especially online","original":""},{"group":"Growth, Decline, And Change","word":"wane","definition":"weaken","original":""},{"group":"Growth, Decline, And Change","word":"wilt","definition":"wither","original":""},{"group":"Hardship, Harm, And Poverty","word":"adversity","definition":"dilemma","original":""},{"group":"Hardship, Harm, And Poverty","word":"afloat","definition":"financially solvent","original":""},{"group":"Hardship, Harm, And Poverty","word":"aggrieve","definition":"hurt","original":""},{"group":"Hardship, Harm, And Poverty","word":"annihilate","definition":"destroy","original":"annihlate"},{"group":"Hardship, Harm, And Poverty","word":"arduous","definition":"hard","original":""},{"group":"Hardship, Harm, And Poverty","word":"bane","definition":"curse/scourge/nemesis/affliction/blight","original":""},{"group":"Hardship, Harm, And Poverty","word":"bleak","definition":"desolate","original":""},{"group":"Hardship, Harm, And Poverty","word":"decrepit","definition":"dilapidated","original":""},{"group":"Hardship, Harm, And Poverty","word":"deleterious","definition":"harmful","original":""},{"group":"Hardship, Harm, And Poverty","word":"destitute","definition":"inverse/poor","original":""},{"group":"Hardship, Harm, And Poverty","word":"dilapidated","definition":"ramshackle/decrepit","original":""},{"group":"Hardship, Harm, And Poverty","word":"diligence","definition":"diligence; hard work","original":""},{"group":"Hardship, Harm, And Poverty","word":"dire","definition":"extremely serious; urgent","original":""},{"group":"Hardship, Harm, And Poverty","word":"flimsy","definition":"fragile","original":"filmsy"},{"group":"Hardship, Harm, And Poverty","word":"gravitas","definition":"serious dignity","original":""},{"group":"Hardship, Harm, And Poverty","word":"grievous","definition":"serious; causing grief","original":""},{"group":"Hardship, Harm, And Poverty","word":"imperative","definition":"necessary/in urgent","original":""},{"group":"Hardship, Harm, And Poverty","word":"impoverish","definition":"make barren","original":""},{"group":"Hardship, Harm, And Poverty","word":"industrious","definition":"diligence; hard work","original":""},{"group":"Hardship, Harm, And Poverty","word":"lousy","definition":"poor; unpleasant","original":""},{"group":"Hardship, Harm, And Poverty","word":"malady","definition":"sickness","original":""},{"group":"Hardship, Harm, And Poverty","word":"mar","definition":"destroy","original":""},{"group":"Hardship, Harm, And Poverty","word":"mightily","definition":"diligence; hard work/very","original":""},{"group":"Hardship, Harm, And Poverty","word":"pernicious","definition":"toxic","original":""},{"group":"Hardship, Harm, And Poverty","word":"persecute","definition":"harm","original":"persecure"},{"group":"Hardship, Harm, And Poverty","word":"spare","definition":"don't harm/save","original":""},{"group":"Hardship, Harm, And Poverty","word":"spoil","definition":"ruin; pamper too much","original":""},{"group":"Hardship, Harm, And Poverty","word":"surly","definition":"poor; unpleasant-tempered","original":""},{"group":"Hardship, Harm, And Poverty","word":"toil","definition":"hard work","original":""},{"group":"Hardship, Harm, And Poverty","word":"undercut","definition":"destroy","original":""},{"group":"Movement, Travel, And Direction","word":"afar","definition":"far","original":""},{"group":"Movement, Travel, And Direction","word":"alight","definition":"descend; land; catch fire","original":""},{"group":"Movement, Travel, And Direction","word":"dip","definition":"descend","original":""},{"group":"Movement, Travel, And Direction","word":"excursion","definition":"short journey","original":""},{"group":"Movement, Travel, And Direction","word":"lunge","definition":"launch/jump","original":""},{"group":"Movement, Travel, And Direction","word":"plod","definition":"walk slowly and heavily","original":""},{"group":"Movement, Travel, And Direction","word":"plunge","definition":"drop sharply; dive","original":""},{"group":"Movement, Travel, And Direction","word":"procession","definition":"line of people moving ceremonially","original":""},{"group":"Movement, Travel, And Direction","word":"ricochet","definition":"bounce","original":""},{"group":"Movement, Travel, And Direction","word":"roam","definition":"stroll","original":""},{"group":"Movement, Travel, And Direction","word":"saunter","definition":"stroll","original":""},{"group":"Movement, Travel, And Direction","word":"shuffle","definition":"dragging feet walking","original":""},{"group":"Movement, Travel, And Direction","word":"stray","definition":"deviate","original":""},{"group":"Movement, Travel, And Direction","word":"swarm","definition":"move as group","original":""},{"group":"Movement, Travel, And Direction","word":"vicinity","definition":"nearby; proximity","original":"vincinity"},{"group":"Movement, Travel, And Direction","word":"wade","definition":"cross water","original":""},{"group":"Movement, Travel, And Direction","word":"wend","definition":"go; proceed","original":""},{"group":"Objects, Clothing, And Materials","word":"affix","definition":"append","original":""},{"group":"Objects, Clothing, And Materials","word":"apparel","definition":"dress","original":""},{"group":"Objects, Clothing, And Materials","word":"appendage","definition":"appended object","original":""},{"group":"Objects, Clothing, And Materials","word":"attire","definition":"clothes","original":""},{"group":"Objects, Clothing, And Materials","word":"cleft","definition":"fissure","original":""},{"group":"Objects, Clothing, And Materials","word":"collage","definition":"art technique, sticking materials","original":""},{"group":"Objects, Clothing, And Materials","word":"edifice","definition":"skyscrapers","original":""},{"group":"Objects, Clothing, And Materials","word":"embellishment","definition":"decoration","original":""},{"group":"Objects, Clothing, And Materials","word":"fasten","definition":"attach securely","original":""},{"group":"Objects, Clothing, And Materials","word":"forage","definition":"finding food","original":""},{"group":"Objects, Clothing, And Materials","word":"garment","definition":"apparel","original":""},{"group":"Objects, Clothing, And Materials","word":"keepsake","definition":"souvenir","original":""},{"group":"Objects, Clothing, And Materials","word":"memento","definition":"souvenir","original":""},{"group":"Objects, Clothing, And Materials","word":"rectory","definition":"church house","original":""},{"group":"Objects, Clothing, And Materials","word":"staple","definition":"principal; chief food/product","original":""},{"group":"Objects, Clothing, And Materials","word":"stockpile","definition":"store","original":""},{"group":"Objects, Clothing, And Materials","word":"trove","definition":"treasure","original":""},{"group":"Order, Mixture, And Structure","word":"agglomeration","definition":"cluster; mass; gathering","original":""},{"group":"Order, Mixture, And Structure","word":"anthology","definition":"collection","original":""},{"group":"Order, Mixture, And Structure","word":"assortment","definition":"diversity","original":""},{"group":"Order, Mixture, And Structure","word":"bifurcation","definition":"diverge","original":"bifuracation"},{"group":"Order, Mixture, And Structure","word":"clutter","definition":"mess; disorder","original":""},{"group":"Order, Mixture, And Structure","word":"collocation","definition":"common pairing of words","original":""},{"group":"Order, Mixture, And Structure","word":"concoction","definition":"mixture","original":""},{"group":"Order, Mixture, And Structure","word":"corpus","definition":"collection","original":""},{"group":"Order, Mixture, And Structure","word":"demarcate","definition":"draw line","original":""},{"group":"Order, Mixture, And Structure","word":"entwine","definition":"interwine","original":""},{"group":"Order, Mixture, And Structure","word":"jumble","definition":"messy","original":""},{"group":"Order, Mixture, And Structure","word":"juxtaposition","definition":"opposite together","original":""},{"group":"Order, Mixture, And Structure","word":"mingle","definition":"mix","original":""},{"group":"Order, Mixture, And Structure","word":"splice","definition":"link","original":""},{"group":"Order, Mixture, And Structure","word":"wreathe","definition":"surround","original":""},{"group":"Place, Nature, And Physical World","word":"annular","definition":"circular","original":""},{"group":"Place, Nature, And Physical World","word":"aperture","definition":"hole","original":""},{"group":"Place, Nature, And Physical World","word":"arable","definition":"farmable","original":""},{"group":"Place, Nature, And Physical World","word":"aridity","definition":"dry","original":""},{"group":"Place, Nature, And Physical World","word":"bison","definition":"large shaggy wild ox","original":""},{"group":"Place, Nature, And Physical World","word":"celestial","definition":"on sky","original":""},{"group":"Place, Nature, And Physical World","word":"crater","definition":"bowl-shaped hollow, often volcanic or meteorite-made","original":""},{"group":"Place, Nature, And Physical World","word":"deciduous","definition":"shedding leaves seasonally","original":"decidous"},{"group":"Place, Nature, And Physical World","word":"desiccate","definition":"dry","original":""},{"group":"Place, Nature, And Physical World","word":"elk","definition":"deer","original":""},{"group":"Place, Nature, And Physical World","word":"endemic","definition":"native; regularly found in a place","original":""},{"group":"Place, Nature, And Physical World","word":"halo","definition":"ring","original":""},{"group":"Place, Nature, And Physical World","word":"incongruous","definition":"out of place; inconsistent","original":""},{"group":"Place, Nature, And Physical World","word":"margin","definition":"blank/edge","original":""},{"group":"Place, Nature, And Physical World","word":"milieu","definition":"environment","original":"milleu"},{"group":"Place, Nature, And Physical World","word":"perforate","definition":"hole punch","original":""},{"group":"Place, Nature, And Physical World","word":"sedimentary","definition":"formed from deposited sediment","original":""},{"group":"Place, Nature, And Physical World","word":"stratum","definition":"level","original":""},{"group":"Place, Nature, And Physical World","word":"ungulate","definition":"hoofed mammal","original":""},{"group":"Place, Nature, And Physical World","word":"vulgar","definition":"low-level","original":""},{"group":"Power, Action, And Control","word":"administer","definition":"implement","original":""},{"group":"Power, Action, And Control","word":"autonomy","definition":"self govern","original":""},{"group":"Power, Action, And Control","word":"bolster","definition":"support","original":""},{"group":"Power, Action, And Control","word":"buttress","definition":"support","original":""},{"group":"Power, Action, And Control","word":"clinch","definition":"settle decisively; secure","original":""},{"group":"Power, Action, And Control","word":"curb","definition":"inhibit","original":""},{"group":"Power, Action, And Control","word":"dexterity","definition":"skillful use of hands or mind","original":""},{"group":"Power, Action, And Control","word":"dislodge","definition":"remove","original":""},{"group":"Power, Action, And Control","word":"endorsement","definition":"agree/support","original":""},{"group":"Power, Action, And Control","word":"exempt","definition":"free","original":""},{"group":"Power, Action, And Control","word":"harness","definition":"exploit","original":""},{"group":"Power, Action, And Control","word":"impel","definition":"drive; urge forward","original":""},{"group":"Power, Action, And Control","word":"leverage","definition":"utilize","original":""},{"group":"Power, Action, And Control","word":"lodge","definition":"block","original":""},{"group":"Power, Action, And Control","word":"oblige","definition":"compel; do a favor for","original":""},{"group":"Power, Action, And Control","word":"oust","definition":"remove from position","original":""},{"group":"Power, Action, And Control","word":"preclude","definition":"forestall","original":""},{"group":"Power, Action, And Control","word":"stunt","definition":"stymie","original":""},{"group":"Power, Action, And Control","word":"subdue","definition":"conquer","original":""},{"group":"Power, Action, And Control","word":"thwart","definition":"prevent; block","original":""},{"group":"Power, Action, And Control","word":"usher","definition":"guide; bring in","original":""},{"group":"Power, Action, And Control","word":"wield","definition":"use; exercise power","original":""},{"group":"Praise, Respect, And Fame","word":"accolade","definition":"prize","original":""},{"group":"Praise, Respect, And Fame","word":"eminence","definition":"outstanding","original":""},{"group":"Praise, Respect, And Fame","word":"eulogize","definition":"praise","original":""},{"group":"Praise, Respect, And Fame","word":"eulogy","definition":"speech praising someone, often after death","original":""},{"group":"Praise, Respect, And Fame","word":"exalt","definition":"praise","original":""},{"group":"Praise, Respect, And Fame","word":"groovy","definition":"stylish; excellent; fashionable","original":""},{"group":"Praise, Respect, And Fame","word":"homage","definition":"public respect; tribute","original":""},{"group":"Praise, Respect, And Fame","word":"illustrious","definition":"famous","original":""},{"group":"Praise, Respect, And Fame","word":"kudos","definition":"honor","original":""},{"group":"Praise, Respect, And Fame","word":"laudable","definition":"praisable","original":""},{"group":"Praise, Respect, And Fame","word":"luminary","definition":"celebrity","original":""},{"group":"Praise, Respect, And Fame","word":"ovation","definition":"clapping","original":""},{"group":"Praise, Respect, And Fame","word":"personage","definition":"celebrity","original":""},{"group":"Praise, Respect, And Fame","word":"preeminent","definition":"outstanding","original":""},{"group":"Praise, Respect, And Fame","word":"renown","definition":"fame","original":""},{"group":"Praise, Respect, And Fame","word":"renowned","definition":"famous","original":""},{"group":"Praise, Respect, And Fame","word":"resplendent","definition":"splendid","original":""},{"group":"Praise, Respect, And Fame","word":"salient","definition":"outstanding","original":""},{"group":"Praise, Respect, And Fame","word":"stately","definition":"majestic; dignified","original":""},{"group":"Praise, Respect, And Fame","word":"tout","definition":"praise","original":""},{"group":"Praise, Respect, And Fame","word":"tribute","definition":"salute","original":""},{"group":"Praise, Respect, And Fame","word":"venerable","definition":"statuous","original":""},{"group":"Praise, Respect, And Fame","word":"venerate","definition":"respect","original":""},{"group":"Quantity, Degree, And Time","word":"antiquity","definition":"very old; ancient","original":""},{"group":"Quantity, Degree, And Time","word":"archaic","definition":"very old; ancient","original":""},{"group":"Quantity, Degree, And Time","word":"biennial","definition":"happening every two years","original":""},{"group":"Quantity, Degree, And Time","word":"bout","definition":"short period; contest","original":""},{"group":"Quantity, Degree, And Time","word":"bygone","definition":"past","original":""},{"group":"Quantity, Degree, And Time","word":"de facto","definition":"in fact","original":""},{"group":"Quantity, Degree, And Time","word":"downright","definition":"completely","original":""},{"group":"Quantity, Degree, And Time","word":"extant","definition":"existing","original":""},{"group":"Quantity, Degree, And Time","word":"extirpate","definition":"root out; destroy completely","original":"extripate"},{"group":"Quantity, Degree, And Time","word":"formidable","definition":"large; impressive","original":""},{"group":"Quantity, Degree, And Time","word":"heretofore","definition":"before/until now","original":""},{"group":"Quantity, Degree, And Time","word":"heyday","definition":"best time","original":""},{"group":"Quantity, Degree, And Time","word":"imminent","definition":"upcoming","original":""},{"group":"Quantity, Degree, And Time","word":"inaugural","definition":"first; marking a beginning","original":""},{"group":"Quantity, Degree, And Time","word":"interlude","definition":"interval","original":""},{"group":"Quantity, Degree, And Time","word":"ordeal","definition":"hard time","original":""},{"group":"Quantity, Degree, And Time","word":"outright","definition":"completely","original":""},{"group":"Quantity, Degree, And Time","word":"petty","definition":"trivial; small-minded","original":""},{"group":"Quantity, Degree, And Time","word":"pinches","definition":"squeezes; small amounts","original":""},{"group":"Quantity, Degree, And Time","word":"premier","definition":"first; leading; debut","original":""},{"group":"Quantity, Degree, And Time","word":"preponderance","definition":"majority; many","original":""},{"group":"Quantity, Degree, And Time","word":"prodigious","definition":"large; impressive","original":""},{"group":"Quantity, Degree, And Time","word":"quotidian","definition":"daily","original":""},{"group":"Quantity, Degree, And Time","word":"raze","definition":"ruin completely","original":""},{"group":"Quantity, Degree, And Time","word":"spate","definition":"large number","original":""},{"group":"Quantity, Degree, And Time","word":"temporal","definition":"time related","original":""},{"group":"Quantity, Degree, And Time","word":"utterly","definition":"absolutely","original":""},{"group":"Religion, Ritual, And Heritage","word":"bequeath","definition":"hand down","original":""},{"group":"Religion, Ritual, And Heritage","word":"consecrate","definition":"make sacred; dedicate","original":""},{"group":"Religion, Ritual, And Heritage","word":"descent","definition":"bloodline","original":""},{"group":"Religion, Ritual, And Heritage","word":"lineage","definition":"ancestry; descent","original":""},{"group":"Religion, Ritual, And Heritage","word":"patrimony","definition":"heritage","original":""},{"group":"Religion, Ritual, And Heritage","word":"pedigree","definition":"descent","original":""},{"group":"Religion, Ritual, And Heritage","word":"posterity","definition":"descendants","original":""},{"group":"Religion, Ritual, And Heritage","word":"rite","definition":"ritual","original":""},{"group":"Religion, Ritual, And Heritage","word":"sanctity","definition":"sacredness; holiness","original":""},{"group":"Religion, Ritual, And Heritage","word":"tenet","definition":"creed","original":"tenent"},{"group":"Speech, Writing, And Meaning","word":"air","definition":"manner; atmosphere; broadcast","original":""},{"group":"Speech, Writing, And Meaning","word":"allegorical","definition":"symbolic; using allegory","original":"allegotical"},{"group":"Speech, Writing, And Meaning","word":"babble","definition":"prattle/jabber/gibber/chatter","original":""},{"group":"Speech, Writing, And Meaning","word":"clear-cut","definition":"clear; definite","original":"clearcut"},{"group":"Speech, Writing, And Meaning","word":"concise","definition":"brief and clear","original":""},{"group":"Speech, Writing, And Meaning","word":"correspondence","definition":"same/mail","original":""},{"group":"Speech, Writing, And Meaning","word":"correspondent","definition":"reporter","original":""},{"group":"Speech, Writing, And Meaning","word":"delineate","definition":"describe","original":""},{"group":"Speech, Writing, And Meaning","word":"denote","definition":"symbolize","original":""},{"group":"Speech, Writing, And Meaning","word":"digress","definition":"off-theme; subject","original":""},{"group":"Speech, Writing, And Meaning","word":"digression","definition":"off-theme; subject","original":""},{"group":"Speech, Writing, And Meaning","word":"discourse","definition":"speech","original":""},{"group":"Speech, Writing, And Meaning","word":"divulge","definition":"leak","original":""},{"group":"Speech, Writing, And Meaning","word":"dub","definition":"give name","original":""},{"group":"Speech, Writing, And Meaning","word":"enumerate","definition":"list","original":""},{"group":"Speech, Writing, And Meaning","word":"hieroglyph","definition":"picture symbol used in ancient writing","original":""},{"group":"Speech, Writing, And Meaning","word":"litany","definition":"long repetitive list","original":""},{"group":"Speech, Writing, And Meaning","word":"moniker","definition":"name","original":""},{"group":"Speech, Writing, And Meaning","word":"profess","definition":"announce","original":""},{"group":"Speech, Writing, And Meaning","word":"purport","definition":"claim","original":""},{"group":"Speech, Writing, And Meaning","word":"succinct","definition":"concise","original":""},{"group":"Speech, Writing, And Meaning","word":"tangential","definition":"off-theme; subject","original":""},{"group":"Speech, Writing, And Meaning","word":"terse","definition":"concise","original":""},{"group":"Speech, Writing, And Meaning","word":"titular","definition":"having a title only; nominal","original":""},{"group":"Speech, Writing, And Meaning","word":"trope","definition":"recurring theme; figure of speech","original":""},{"group":"Speech, Writing, And Meaning","word":"verbose","definition":"long/chatty","original":""},{"group":"Thinking, Knowledge, And Proof","word":"astute","definition":"sharp","original":""},{"group":"Thinking, Knowledge, And Proof","word":"attest","definition":"prove","original":""},{"group":"Thinking, Knowledge, And Proof","word":"baffle","definition":"confuse","original":""},{"group":"Thinking, Knowledge, And Proof","word":"brood","definition":"contemplate","original":""},{"group":"Thinking, Knowledge, And Proof","word":"calibration","definition":"adjustment for accuracy","original":""},{"group":"Thinking, Knowledge, And Proof","word":"coherent","definition":"logical; consistent","original":""},{"group":"Thinking, Knowledge, And Proof","word":"corollary","definition":"inference","original":""},{"group":"Thinking, Knowledge, And Proof","word":"credence","definition":"belief","original":""},{"group":"Thinking, Knowledge, And Proof","word":"creed","definition":"belief","original":""},{"group":"Thinking, Knowledge, And Proof","word":"cryptic","definition":"mystic","original":""},{"group":"Thinking, Knowledge, And Proof","word":"engross","definition":"focus","original":""},{"group":"Thinking, Knowledge, And Proof","word":"enigma","definition":"mystery","original":""},{"group":"Thinking, Knowledge, And Proof","word":"erudite","definition":"intellectual","original":""},{"group":"Thinking, Knowledge, And Proof","word":"erudition","definition":"deep learning; scholarship","original":""},{"group":"Thinking, Knowledge, And Proof","word":"fixation","definition":"obsession; intense focus","original":""},{"group":"Thinking, Knowledge, And Proof","word":"inscrutable","definition":"enigmatic/cryptic/unfathomable","original":""},{"group":"Thinking, Knowledge, And Proof","word":"judicious","definition":"wise; showing good judgment","original":""},{"group":"Thinking, Knowledge, And Proof","word":"pedant","definition":"nerd","original":""},{"group":"Thinking, Knowledge, And Proof","word":"perceptive","definition":"sharp","original":""},{"group":"Thinking, Knowledge, And Proof","word":"plausibility","definition":"credibility","original":""},{"group":"Thinking, Knowledge, And Proof","word":"pore","definition":"study closely","original":""},{"group":"Thinking, Knowledge, And Proof","word":"posit","definition":"hypothesize","original":""},{"group":"Thinking, Knowledge, And Proof","word":"postulate","definition":"hypothesize","original":""},{"group":"Thinking, Knowledge, And Proof","word":"preoccupation","definition":"focus","original":""},{"group":"Thinking, Knowledge, And Proof","word":"rumination","definition":"contemplate","original":""},{"group":"Thinking, Knowledge, And Proof","word":"summation","definition":"summary","original":""},{"group":"Thinking, Knowledge, And Proof","word":"synopsis","definition":"summary","original":""},{"group":"Thinking, Knowledge, And Proof","word":"treatise","definition":"essay","original":""},{"group":"Thinking, Knowledge, And Proof","word":"veracity","definition":"accuracy","original":""},{"group":"Work, Skill, And Practical Life","word":"acquisition","definition":"act of gaining or obtaining","original":""},{"group":"Work, Skill, And Practical Life","word":"adroitness","definition":"dexterity/deftness","original":"ardroitness"},{"group":"Work, Skill, And Practical Life","word":"austerity","definition":"tight policy","original":""},{"group":"Work, Skill, And Practical Life","word":"avail","definition":"benefit; usefulness","original":""},{"group":"Work, Skill, And Practical Life","word":"connoisseur","definition":"expert judge","original":"connoiseur"},{"group":"Work, Skill, And Practical Life","word":"drudgery","definition":"dull business","original":""},{"group":"Work, Skill, And Practical Life","word":"frugal","definition":"thrifty/economical/sparing","original":""},{"group":"Work, Skill, And Practical Life","word":"mercantile","definition":"commercial","original":""},{"group":"Work, Skill, And Practical Life","word":"peddle","definition":"sell; promote","original":""},{"group":"Work, Skill, And Practical Life","word":"procure","definition":"gain","original":""},{"group":"Work, Skill, And Practical Life","word":"regimen","definition":"planned routine, especially for health","original":""},{"group":"Work, Skill, And Practical Life","word":"repertoire","definition":"skill repository","original":""},{"group":"Work, Skill, And Practical Life","word":"seasoned","definition":"experienced","original":""},{"group":"Work, Skill, And Practical Life","word":"virtuosity","definition":"skill","original":""},{"group":"Work, Skill, And Practical Life","word":"wholesale","definition":"bought in batch","original":""}];
+    const GROUPS = ["Agreement, Law, And Rules","Appearance, Sound, And Senses","Character And Behavior","Criticism, Mockery, And Conflict","Deceit, Secrecy, And Artificiality","Desire, Appeal, And Motivation","Emotion And Temperament","General Study Words","Groups, Society, And People","Growth, Decline, And Change","Hardship, Harm, And Poverty","Movement, Travel, And Direction","Objects, Clothing, And Materials","Order, Mixture, And Structure","Place, Nature, And Physical World","Power, Action, And Control","Praise, Respect, And Fame","Quantity, Degree, And Time","Religion, Ritual, And Heritage","Speech, Writing, And Meaning","Thinking, Knowledge, And Proof","Work, Skill, And Practical Life"];
+    const storageKey = "codex_vocab_quiz_memory_v1";
+    const session = { seen: 0, known: 0, missed: 0, recent: [], missedItems: [] };
+    let memory = loadMemory();
+    let current = null;
+    let answerVisible = false;
+    let mode = "word";
+    let draw = "weak";
+
+    const els = {
+      deckCount: document.getElementById("deckCount"),
+      groupSelect: document.getElementById("groupSelect"),
+      searchBox: document.getElementById("searchBox"),
+      modeWord: document.getElementById("modeWord"),
+      modeDef: document.getElementById("modeDef"),
+      drawWeak: document.getElementById("drawWeak"),
+      drawRandom: document.getElementById("drawRandom"),
+      currentGroup: document.getElementById("currentGroup"),
+      promptText: document.getElementById("promptText"),
+      answerText: document.getElementById("answerText"),
+      showAnswer: document.getElementById("showAnswer"),
+      knowBtn: document.getElementById("knowBtn"),
+      missBtn: document.getElementById("missBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      resetSession: document.getElementById("resetSession"),
+      resetMemory: document.getElementById("resetMemory"),
+      seenCount: document.getElementById("seenCount"),
+      knownCount: document.getElementById("knownCount"),
+      missedCount: document.getElementById("missedCount"),
+      accuracy: document.getElementById("accuracy"),
+      missedList: document.getElementById("missedList"),
+      recentList: document.getElementById("recentList")
+    };
+
+    init();
+
+    function init() {
+      els.deckCount.textContent = WORDS.length;
+      els.groupSelect.innerHTML = '<option value="">All Groups</option>' + GROUPS.map(group => '<option>' + escapeHtml(group) + '</option>').join("");
+      bind();
+      pickNext();
+      updateStats();
+    }
+
+    function bind() {
+      els.groupSelect.addEventListener("change", pickNext);
+      els.searchBox.addEventListener("input", pickNext);
+      els.showAnswer.addEventListener("click", reveal);
+      els.nextBtn.addEventListener("click", pickNext);
+      els.knowBtn.addEventListener("click", () => grade(true));
+      els.missBtn.addEventListener("click", () => grade(false));
+      els.modeWord.addEventListener("click", () => setMode("word"));
+      els.modeDef.addEventListener("click", () => setMode("definition"));
+      els.drawWeak.addEventListener("click", () => setDraw("weak"));
+      els.drawRandom.addEventListener("click", () => setDraw("random"));
+      els.resetSession.addEventListener("click", () => {
+        session.seen = 0; session.known = 0; session.missed = 0; session.recent = []; session.missedItems = [];
+        updateStats();
+        renderLists();
+      });
+      els.resetMemory.addEventListener("click", () => {
+        memory = {};
+        localStorage.removeItem(storageKey);
+        pickNext();
+      });
+      window.addEventListener("keydown", event => {
+        if (event.target.matches("input, select")) return;
+        if (event.key === " ") { event.preventDefault(); answerVisible ? pickNext() : reveal(); }
+        if (event.key === "1") grade(true);
+        if (event.key === "2") grade(false);
+      });
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+      els.modeWord.classList.toggle("active", mode === "word");
+      els.modeDef.classList.toggle("active", mode === "definition");
+      renderCard();
+    }
+
+    function setDraw(nextDraw) {
+      draw = nextDraw;
+      els.drawWeak.classList.toggle("active", draw === "weak");
+      els.drawRandom.classList.toggle("active", draw === "random");
+      pickNext();
+    }
+
+    function filteredWords() {
+      const group = els.groupSelect.value;
+      const query = els.searchBox.value.trim().toLowerCase();
+      return WORDS.filter(item => {
+        const groupMatch = !group || item.group === group;
+        const queryMatch = !query || item.word.toLowerCase().includes(query) || item.definition.toLowerCase().includes(query);
+        return groupMatch && queryMatch;
+      });
+    }
+
+    function pickNext() {
+      const deck = filteredWords();
+      answerVisible = false;
+      if (!deck.length) {
+        current = null;
+        els.currentGroup.textContent = "";
+        els.promptText.textContent = "No matching words";
+        els.promptText.classList.remove("definition");
+        els.answerText.textContent = "Try a different filter";
+        els.answerText.classList.add("hidden");
+        return;
+      }
+      current = draw === "weak" ? weightedPick(deck) : deck[Math.floor(Math.random() * deck.length)];
+      session.seen += 1;
+      session.recent.unshift(current);
+      session.recent = dedupeByWord(session.recent).slice(0, 10);
+      renderCard();
+      updateStats();
+      renderLists();
+    }
+
+    function weightedPick(deck) {
+      const weighted = deck.map(item => {
+        const record = memory[item.word] || { score: 0, missed: 0, known: 0 };
+        const weight = Math.max(1, 6 - record.score + record.missed * 2);
+        return { item, weight };
+      });
+      const total = weighted.reduce((sum, entry) => sum + entry.weight, 0);
+      let roll = Math.random() * total;
+      for (const entry of weighted) {
+        roll -= entry.weight;
+        if (roll <= 0) return entry.item;
+      }
+      return weighted[0].item;
+    }
+
+    function reveal() {
+      if (!current) return;
+      answerVisible = true;
+      renderCard();
+    }
+
+    function grade(isKnown) {
+      if (!current) return;
+      if (!answerVisible) reveal();
+      const record = memory[current.word] || { score: 0, known: 0, missed: 0 };
+      if (isKnown) {
+        record.known += 1;
+        record.score = Math.min(8, record.score + 1);
+        session.known += 1;
+      } else {
+        record.missed += 1;
+        record.score = Math.max(-8, record.score - 2);
+        session.missed += 1;
+        session.missedItems.unshift(current);
+        session.missedItems = dedupeByWord(session.missedItems).slice(0, 20);
+      }
+      memory[current.word] = record;
+      saveMemory();
+      pickNext();
+    }
+
+    function renderCard() {
+      if (!current) return;
+      const prompt = mode === "word" ? current.word : current.definition;
+      const answer = mode === "word" ? current.definition : current.word;
+      els.currentGroup.textContent = current.group;
+      els.promptText.textContent = prompt;
+      els.promptText.classList.toggle("definition", mode === "definition");
+      els.answerText.textContent = answerVisible ? answer : "Answer first, then reveal";
+      els.answerText.classList.toggle("hidden", !answerVisible);
+    }
+
+    function updateStats() {
+      els.seenCount.textContent = session.seen;
+      els.knownCount.textContent = session.known;
+      els.missedCount.textContent = session.missed;
+      const attempts = session.known + session.missed;
+      els.accuracy.textContent = attempts ? Math.round(session.known / attempts * 100) + "%" : "0%";
+    }
+
+    function renderLists() {
+      els.missedList.innerHTML = renderItemList(session.missedItems, "No missed words yet");
+      els.recentList.innerHTML = renderItemList(session.recent, "No review history yet");
+    }
+
+    function renderItemList(items, emptyText) {
+      if (!items.length) return '<div class="empty">' + emptyText + '</div>';
+      return items.map(item => '<div class="item"><b>' + escapeHtml(item.word) + '</b><span>' + escapeHtml(item.definition) + '</span></div>').join("");
+    }
+
+    function dedupeByWord(items) {
+      const seen = new Set();
+      return items.filter(item => {
+        if (seen.has(item.word)) return false;
+        seen.add(item.word);
+        return true;
+      });
+    }
+
+    function loadMemory() {
+      try { return JSON.parse(localStorage.getItem(storageKey) || "{}"); }
+      catch { return {}; }
+    }
+
+    function saveMemory() {
+      localStorage.setItem(storageKey, JSON.stringify(memory));
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[char]));
+    }
+  </script>
+</body>
+</html>
