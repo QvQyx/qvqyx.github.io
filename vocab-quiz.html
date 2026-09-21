@@ -231,7 +231,7 @@
       <section class="stats" aria-label="Session stats">
         <div class="stat"><b id="seenCount">0</b><span>Reviewed</span></div>
         <div class="stat"><b id="knownCount">0</b><span>Known</span></div>
-        <div class="stat"><b id="missedCount">0</b><span>Missed</span></div>
+        <div class="stat" aria-live="polite"><b id="missedCount">0</b><span>Missed Remaining</span></div>
         <div class="stat"><b id="accuracy">0%</b><span>Accuracy</span></div>
       </section>
     </header>
@@ -273,10 +273,11 @@
           <button type="button" id="knowBtn">I Know It</button>
           <button type="button" id="missBtn">Missed It</button>
           <button type="button" id="nextBtn">Next Word</button>
+          <button type="button" id="restartBtn" class="primary" hidden>Start Again</button>
         </div>
         <section class="history">
           <div class="panel mini">
-            <h2>Missed This Session</h2>
+            <h2>Missed Remaining</h2>
             <div class="list" id="missedList"></div>
           </div>
           <div class="panel mini">
@@ -313,6 +314,7 @@
       knowBtn: document.getElementById("knowBtn"),
       missBtn: document.getElementById("missBtn"),
       nextBtn: document.getElementById("nextBtn"),
+      restartBtn: document.getElementById("restartBtn"),
       resetSession: document.getElementById("resetSession"),
       resetMemory: document.getElementById("resetMemory"),
       seenCount: document.getElementById("seenCount"),
@@ -338,6 +340,14 @@
       els.searchBox.addEventListener("input", pickNext);
       els.showAnswer.addEventListener("click", reveal);
       els.nextBtn.addEventListener("click", pickNext);
+      els.restartBtn.addEventListener("click", () => {
+        memory = {};
+        localStorage.removeItem(storageKey);
+        session.seen = 0; session.known = 0; session.missed = 0; session.recent = []; session.missedItems = [];
+        els.groupSelect.value = "";
+        els.searchBox.value = "";
+        setDraw("weak");
+      });
       els.knowBtn.addEventListener("click", () => grade(true));
       els.missBtn.addEventListener("click", () => grade(false));
       els.modeWord.addEventListener("click", () => setMode("word"));
@@ -389,37 +399,32 @@
     function pickNext() {
       const deck = filteredWords();
       answerVisible = false;
-      if (!deck.length) {
+      const pending = deck.filter(item => memory[item.word]?.status === "missed");
+      const uncleared = deck.filter(item => memory[item.word]?.status !== "known");
+      const pool = draw === "weak" ? (pending.length ? pending : uncleared) : deck;
+      els.restartBtn.hidden = !(deck.length && !pool.length);
+      if (!pool.length) {
         current = null;
         els.currentGroup.textContent = "";
-        els.promptText.textContent = "No matching words";
+        els.promptText.textContent = deck.length ? "All words cleared!" : "No matching words";
         els.promptText.classList.remove("definition");
-        els.answerText.textContent = "Try a different filter";
-        els.answerText.classList.add("hidden");
+        els.answerText.textContent = deck.length ? "All words in this selection are known." : "Try a different filter";
+        els.answerText.classList.remove("hidden");
+        els.showAnswer.disabled = els.knowBtn.disabled = els.missBtn.disabled = els.nextBtn.disabled = true;
+        updateStats();
+        renderLists();
         return;
       }
-      current = draw === "weak" ? weightedPick(deck) : deck[Math.floor(Math.random() * deck.length)];
+      els.showAnswer.disabled = els.knowBtn.disabled = els.missBtn.disabled = els.nextBtn.disabled = false;
+      const alternatives = pool.filter(item => item.word !== current?.word);
+      const candidates = alternatives.length ? alternatives : pool;
+      current = candidates[Math.floor(Math.random() * candidates.length)];
       session.seen += 1;
       session.recent.unshift(current);
       session.recent = dedupeByWord(session.recent).slice(0, 10);
       renderCard();
       updateStats();
       renderLists();
-    }
-
-    function weightedPick(deck) {
-      const weighted = deck.map(item => {
-        const record = memory[item.word] || { score: 0, missed: 0, known: 0 };
-        const weight = Math.max(1, 6 - record.score + record.missed * 2);
-        return { item, weight };
-      });
-      const total = weighted.reduce((sum, entry) => sum + entry.weight, 0);
-      let roll = Math.random() * total;
-      for (const entry of weighted) {
-        roll -= entry.weight;
-        if (roll <= 0) return entry.item;
-      }
-      return weighted[0].item;
     }
 
     function reveal() {
@@ -432,6 +437,7 @@
       if (!current) return;
       if (!answerVisible) reveal();
       const record = memory[current.word] || { score: 0, known: 0, missed: 0 };
+      record.status = isKnown ? "known" : "missed";
       if (isKnown) {
         record.known += 1;
         record.score = Math.min(8, record.score + 1);
@@ -462,13 +468,13 @@
     function updateStats() {
       els.seenCount.textContent = session.seen;
       els.knownCount.textContent = session.known;
-      els.missedCount.textContent = session.missed;
+      els.missedCount.textContent = WORDS.filter(item => memory[item.word]?.status === "missed").length;
       const attempts = session.known + session.missed;
       els.accuracy.textContent = attempts ? Math.round(session.known / attempts * 100) + "%" : "0%";
     }
 
     function renderLists() {
-      els.missedList.innerHTML = renderItemList(session.missedItems, "No missed words yet");
+      els.missedList.innerHTML = renderItemList(WORDS.filter(item => memory[item.word]?.status === "missed"), "No missed words remaining");
       els.recentList.innerHTML = renderItemList(session.recent, "No review history yet");
     }
 
@@ -487,7 +493,16 @@
     }
 
     function loadMemory() {
-      try { return JSON.parse(localStorage.getItem(storageKey) || "{}"); }
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+        if (!saved || typeof saved !== "object" || Array.isArray(saved)) return {};
+        for (const [word, record] of Object.entries(saved)) {
+          if (!record || typeof record !== "object") { delete saved[word]; continue; }
+          // Older progress did not record the latest answer; recheck previously missed words.
+          if (!record.status) record.status = record.missed > 0 ? "missed" : record.known > 0 ? "known" : "new";
+        }
+        return saved;
+      }
       catch { return {}; }
     }
 
