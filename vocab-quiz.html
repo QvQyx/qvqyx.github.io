@@ -251,7 +251,7 @@
         <div>
           <label>Draw Mode</label>
           <div class="segmented">
-            <button type="button" id="drawWeak" class="active">Prioritize Missed</button>
+            <button type="button" id="drawWeak" class="active">Review Rounds</button>
             <button type="button" id="drawRandom">Random</button>
           </div>
         </div>
@@ -298,6 +298,32 @@
     let answerVisible = false;
     let mode = "word";
     let draw = "weak";
+    const roundStorageKey = "codex_vocab_quiz_rounds_v1";
+    let rounds = {};
+
+    function selectionKey() {
+      return JSON.stringify([els.groupSelect.value, els.searchBox.value.trim().toLowerCase()]);
+    }
+
+    function shuffled(words) {
+      const result = [...words];
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    }
+
+    function activeRound() {
+      const key = selectionKey();
+      if (!rounds[key]) rounds[key] = { number: 1, queue: shuffled(filteredWords().map(item => item.word)), index: 0, missed: [] };
+      return rounds[key];
+    }
+
+    function saveRoundProgress() {
+      localStorage.setItem(roundStorageKey, JSON.stringify({ rounds, session, mode, draw,
+        group: els.groupSelect.value, query: els.searchBox.value }));
+    }
 
     const els = {
       deckCount: document.getElementById("deckCount"),
@@ -330,7 +356,27 @@
     function init() {
       els.deckCount.textContent = WORDS.length;
       els.groupSelect.innerHTML = '<option value="">All Groups</option>' + GROUPS.map(group => '<option>' + escapeHtml(group) + '</option>').join("");
+      try {
+        const saved = JSON.parse(localStorage.getItem(roundStorageKey) || "null");
+        if (saved && saved.rounds && typeof saved.rounds === "object") {
+          const valid = new Set(WORDS.map(item => item.word));
+          for (const [key, round] of Object.entries(saved.rounds)) {
+            if (Array.isArray(round.queue) && Array.isArray(round.missed) &&
+                round.queue.every(word => valid.has(word)) && round.missed.every(word => round.queue.includes(word)) &&
+                Number.isInteger(round.index) && round.index >= 0 && round.index <= round.queue.length &&
+                Number.isInteger(round.number) && round.number > 0) rounds[key] = round;
+          }
+          if (saved.session) Object.assign(session, saved.session);
+          els.groupSelect.value = GROUPS.includes(saved.group) ? saved.group : "";
+          els.searchBox.value = typeof saved.query === "string" ? saved.query : "";
+          mode = saved.mode === "definition" ? "definition" : "word";
+          draw = saved.draw === "random" ? "random" : "weak";
+        }
+      } catch {}
       bind();
+      setMode(mode);
+      els.drawWeak.classList.toggle("active", draw === "weak");
+      els.drawRandom.classList.toggle("active", draw === "random");
       pickNext();
       updateStats();
     }
@@ -339,9 +385,10 @@
       els.groupSelect.addEventListener("change", pickNext);
       els.searchBox.addEventListener("input", pickNext);
       els.showAnswer.addEventListener("click", reveal);
-      els.nextBtn.addEventListener("click", pickNext);
+      els.nextBtn.addEventListener("click", () => grade(false));
       els.restartBtn.addEventListener("click", () => {
         memory = {};
+        rounds = {};
         localStorage.removeItem(storageKey);
         session.seen = 0; session.known = 0; session.missed = 0; session.recent = []; session.missedItems = [];
         els.groupSelect.value = "";
@@ -358,15 +405,17 @@
         session.seen = 0; session.known = 0; session.missed = 0; session.recent = []; session.missedItems = [];
         updateStats();
         renderLists();
+        saveRoundProgress();
       });
       els.resetMemory.addEventListener("click", () => {
         memory = {};
+        rounds = {};
         localStorage.removeItem(storageKey);
         pickNext();
       });
       window.addEventListener("keydown", event => {
         if (event.target.matches("input, select")) return;
-        if (event.key === " ") { event.preventDefault(); answerVisible ? pickNext() : reveal(); }
+        if (event.key === " ") { event.preventDefault(); answerVisible ? grade(false) : reveal(); }
         if (event.key === "1") grade(true);
         if (event.key === "2") grade(false);
       });
@@ -377,6 +426,7 @@
       els.modeWord.classList.toggle("active", mode === "word");
       els.modeDef.classList.toggle("active", mode === "definition");
       renderCard();
+      saveRoundProgress();
     }
 
     function setDraw(nextDraw) {
@@ -399,9 +449,8 @@
     function pickNext() {
       const deck = filteredWords();
       answerVisible = false;
-      const pending = deck.filter(item => memory[item.word]?.status === "missed");
-      const uncleared = deck.filter(item => memory[item.word]?.status !== "known");
-      const pool = draw === "weak" ? (pending.length ? pending : uncleared) : deck;
+      const round = activeRound();
+      const pool = draw === "weak" ? deck.filter(item => item.word === round.queue[round.index]) : deck;
       els.restartBtn.hidden = !(deck.length && !pool.length);
       if (!pool.length) {
         current = null;
@@ -413,18 +462,19 @@
         els.showAnswer.disabled = els.knowBtn.disabled = els.missBtn.disabled = els.nextBtn.disabled = true;
         updateStats();
         renderLists();
+        saveRoundProgress();
         return;
       }
       els.showAnswer.disabled = els.knowBtn.disabled = els.missBtn.disabled = els.nextBtn.disabled = false;
       const alternatives = pool.filter(item => item.word !== current?.word);
       const candidates = alternatives.length ? alternatives : pool;
       current = candidates[Math.floor(Math.random() * candidates.length)];
-      session.seen += 1;
       session.recent.unshift(current);
       session.recent = dedupeByWord(session.recent).slice(0, 10);
       renderCard();
       updateStats();
       renderLists();
+      saveRoundProgress();
     }
 
     function reveal() {
@@ -450,6 +500,18 @@
         session.missedItems = dedupeByWord(session.missedItems).slice(0, 20);
       }
       memory[current.word] = record;
+      session.seen += 1;
+      if (draw === "weak") {
+        const round = activeRound();
+        if (!isKnown) round.missed.push(current.word);
+        round.index += 1;
+        if (round.index === round.queue.length && round.missed.length) {
+          round.queue = shuffled(round.missed);
+          round.missed = [];
+          round.index = 0;
+          round.number += 1;
+        }
+      }
       saveMemory();
       pickNext();
     }
@@ -458,7 +520,10 @@
       if (!current) return;
       const prompt = mode === "word" ? current.word : current.definition;
       const answer = mode === "word" ? current.definition : current.word;
-      els.currentGroup.textContent = current.group;
+      const round = activeRound();
+      els.currentGroup.textContent = draw === "weak"
+        ? "Round " + round.number + " · " + (round.index + 1) + " / " + round.queue.length + " · " + current.group
+        : current.group;
       els.promptText.textContent = prompt;
       els.promptText.classList.toggle("definition", mode === "definition");
       els.answerText.textContent = answerVisible ? answer : "Answer first, then reveal";
