@@ -1253,6 +1253,25 @@
       padding-top: clamp(18px, 2.2vw, 30px);
     }
 
+    .project-demo { margin: 0 0 28px; }
+    .project-demo figcaption {
+      margin-bottom: 12px;
+      color: var(--amber);
+      font-size: .8rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .project-demo video {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 1px solid rgba(243, 239, 230, .12);
+      border-radius: 18px;
+      background: #000;
+      cursor: auto;
+    }
+
     .case-controls {
       display: flex;
       justify-content: space-between;
@@ -2410,6 +2429,7 @@
       },
       {
         id: "game0428",
+        video: "assets/0428-demo.mp4",
         title: "0428",
         type: "24h Capstone · Lead Programmer + Mechanics Designer",
         tag: "Unity Game",
@@ -2629,6 +2649,7 @@
 
     function openProject(id) {
       const project = projects.find(item => item.id === id);
+      panel.querySelectorAll("video").forEach(video => video.pause());
       activeProjectId = project.id;
       panel.dataset.project = project.id;
       document.getElementById("detailType").textContent = project.type;
@@ -2661,7 +2682,16 @@
       document.getElementById("detailMeta").innerHTML = project.metrics.map(([label, value]) => `
         <div class="metric"><strong>${label}</strong><span>${value}</span></div>
       `).join("") + (usesWideGallery || usesSharedGallery ? linkBlock : sideGallery + linkBlock);
-      document.getElementById("detailCopy").innerHTML = renderCaseDetail(project) + (usesWideGallery ? sideGallery : "");
+      const videoBlock = project.video ? `
+        <figure class="project-demo">
+          <figcaption id="demoCaption">Gameplay Demo</figcaption>
+          <video controls playsinline preload="none" poster="${project.image}" aria-labelledby="demoCaption">
+            <source src="${project.video}" type="video/mp4">
+            Your browser does not support embedded video. <a href="${project.video}">Watch the gameplay demo</a>.
+          </video>
+        </figure>
+      ` : "";
+      document.getElementById("detailCopy").innerHTML = videoBlock + renderCaseDetail(project) + (usesWideGallery ? sideGallery : "");
       if (usesSharedGallery) panel.querySelector(".detail-body").insertAdjacentHTML("beforeend", sideGallery);
       panel.classList.add("open");
       panel.setAttribute("aria-hidden", "false");
@@ -2672,6 +2702,7 @@
     }
 
     function closeProject() {
+      panel.querySelectorAll("video").forEach(video => video.pause());
       panel.classList.remove("open");
       panel.setAttribute("aria-hidden", "true");
       setBodyHeight();
