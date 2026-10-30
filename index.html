@@ -1272,6 +1272,61 @@
       cursor: auto;
     }
 
+    .detail-panel[data-project="game0428"] #detailMeta .case-thesis {
+      min-height: 0;
+      margin-top: 32px;
+    }
+    .detail-panel[data-project="game0428"] .evidence-grid { gap: 28px; }
+    .detail-panel[data-project="game0428"] .detail-body > .wide-gallery {
+      grid-column: 1 / -1;
+      width: 100%;
+      margin-top: 12px;
+      padding: 24px 0 0;
+      gap: 18px;
+      border: 0;
+      border-top: 1px solid #ddd;
+    }
+    .detail-panel[data-project="game0428"] .detail-body > .wide-gallery img {
+      height: auto;
+      aspect-ratio: 16 / 10;
+      object-fit: contain;
+      background: #f4f4f4;
+      border-radius: 8px;
+    }
+    @media (max-width: 920px) {
+      .detail-panel[data-project="game0428"] .detail-body > .wide-gallery {
+        grid-template-columns: repeat(5, minmax(150px, 1fr));
+        overflow-x: auto;
+      }
+    }
+
+    .detail-panel[data-project="game0428"] .project-demo {
+      margin: 0 0 36px;
+    }
+    .detail-panel[data-project="game0428"] .project-demo figcaption {
+      font-weight: 700 !important;
+      margin: 12px 0 24px;
+    }
+    @media (min-width: 921px) {
+      .detail-panel[data-project="game0428"] .detail-body { align-items: stretch; }
+      .detail-panel[data-project="game0428"] #detailMeta,
+      .detail-panel[data-project="game0428"] #detailCopy {
+        display: flex;
+        flex-direction: column;
+      }
+      .detail-panel[data-project="game0428"] #detailMeta .case-thesis {
+        margin-top: auto;
+        padding-top: 24px !important;
+      }
+      .detail-panel[data-project="game0428"] #detailCopy .evidence-grid {
+        margin-top: auto;
+        border-bottom: 1px solid #ddd;
+      }
+      .detail-panel[data-project="game0428"] #detailCopy .evidence-card {
+        padding-bottom: 24px !important;
+      }
+    }
+
     .case-controls {
       display: flex;
       justify-content: space-between;
@@ -2669,7 +2724,7 @@
       ` : "";
       const usesWideGallery = project.id === "game0428";
       const usesSharedGallery = ["simulative", "forest", "daily", "visualisation", "mimi"].includes(project.id);
-      panel.querySelector(".case-gallery")?.remove();
+      panel.querySelectorAll(".case-gallery, .detail-body > .wide-gallery").forEach(gallery => gallery.remove());
       const sideGallery = project.media && project.media.length > 1 ? `
         <div class="${usesSharedGallery ? "case-gallery" : "side-gallery"} ${usesWideGallery ? "wide-gallery" : ""}">
           <strong>Visual Evidence</strong>
@@ -2691,8 +2746,12 @@
           </video>
         </figure>
       ` : "";
-      document.getElementById("detailCopy").innerHTML = videoBlock + renderCaseDetail(project) + (usesWideGallery ? sideGallery : "");
-      if (usesSharedGallery) panel.querySelector(".detail-body").insertAdjacentHTML("beforeend", sideGallery);
+      document.getElementById("detailCopy").innerHTML = videoBlock + renderCaseDetail(project);
+      if (project.id === "game0428") {
+        const motivation = document.querySelector("#detailCopy .case-thesis");
+        if (motivation) document.getElementById("detailMeta").appendChild(motivation);
+      }
+      if (usesWideGallery || usesSharedGallery) panel.querySelector(".detail-body").insertAdjacentHTML("beforeend", sideGallery);
       panel.classList.add("open");
       panel.setAttribute("aria-hidden", "false");
       setBodyHeight();
